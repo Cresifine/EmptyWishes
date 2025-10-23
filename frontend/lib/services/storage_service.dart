@@ -7,6 +7,10 @@ class StorageService {
   static const String _wishesKey = 'cached_wishes';
   static const String _pendingWishesKey = 'pending_wishes';
   static const String _offlineModeKey = 'offline_mode';
+  static const String _feedCacheKey = 'feed_cache';
+  static const String _pendingProgressUpdatesKey = 'pending_progress_updates';
+  static const String _cachedProgressUpdatesKey = 'cached_progress_updates';
+  static const String _autoSyncKey = 'auto_sync_enabled';
 
   // Token management
   static Future<void> saveToken(String token) async {
@@ -95,6 +99,79 @@ class StorageService {
   static Future<bool> isOfflineMode() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_offlineModeKey) ?? false;
+  }
+
+  // Feed cache management
+  static Future<void> saveFeedCache(List<Map<String, dynamic>> feedItems) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_feedCacheKey, json.encode(feedItems));
+  }
+
+  static Future<List<Map<String, dynamic>>?> getFeedCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    final feedData = prefs.getString(_feedCacheKey);
+    if (feedData != null) {
+      final List<dynamic> decoded = json.decode(feedData);
+      return decoded.cast<Map<String, dynamic>>();
+    }
+    return null;
+  }
+
+  static Future<void> clearFeedCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_feedCacheKey);
+  }
+
+  // Auto-sync settings
+  static Future<void> setAutoSync(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_autoSyncKey, enabled);
+  }
+
+  static Future<bool> isAutoSyncEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_autoSyncKey) ?? true; // Default: enabled
+  }
+
+  // Pending progress updates management
+  static Future<void> savePendingProgressUpdates(List<Map<String, dynamic>> updates) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_pendingProgressUpdatesKey, json.encode(updates));
+  }
+
+  static Future<List<Map<String, dynamic>>?> getPendingProgressUpdates() async {
+    final prefs = await SharedPreferences.getInstance();
+    final updatesData = prefs.getString(_pendingProgressUpdatesKey);
+    if (updatesData != null) {
+      final List<dynamic> decoded = json.decode(updatesData);
+      return decoded.cast<Map<String, dynamic>>();
+    }
+    return null;
+  }
+
+  static Future<void> clearPendingProgressUpdates() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_pendingProgressUpdatesKey);
+  }
+
+  // Cached progress updates management (for offline viewing)
+  static Future<void> saveCachedProgressUpdates(Map<String, dynamic> updates) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_cachedProgressUpdatesKey, json.encode(updates));
+  }
+
+  static Future<Map<String, dynamic>?> getCachedProgressUpdates() async {
+    final prefs = await SharedPreferences.getInstance();
+    final updatesData = prefs.getString(_cachedProgressUpdatesKey);
+    if (updatesData != null) {
+      return json.decode(updatesData) as Map<String, dynamic>;
+    }
+    return null;
+  }
+
+  static Future<void> clearCachedProgressUpdates() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_cachedProgressUpdatesKey);
   }
 
   // Clear all data except offline wishes

@@ -1,0 +1,1419 @@
+INFO:     Will watch for changes in these directories: ['/Users/dmytropaliienko/Documents/GitHub/EmptyWishes/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [64037] using WatchFiles
+INFO:     Started server process [64118]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+2025-10-24 00:09:30,076 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:09:30,077 - app.api.auth - INFO - Login attempt for email: dd@gmail.com
+2025-10-24 00:09:30,088 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/dmytropaliienko/Documents/GitHub/EmptyWishes/backend/venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-24 00:09:30,331 - app.api.auth - INFO - User logged in successfully: dd@gmail.com
+2025-10-24 00:09:30,332 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.26s
+INFO:     127.0.0.1:57456 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:09:30,420 - main - INFO - Request: GET /
+2025-10-24 00:09:30,421 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57457 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:30,421 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:30,423 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57458 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:30,431 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:30,435 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57459 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:09:30,492 - main - INFO - Request: GET /
+2025-10-24 00:09:30,492 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57460 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:30,506 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:30,508 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57461 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:09:30,525 - main - INFO - Request: GET /
+2025-10-24 00:09:30,525 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57462 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:30,541 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:30,545 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57463 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:09:30,557 - main - INFO - Request: GET /
+2025-10-24 00:09:30,558 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57464 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:30,572 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:30,575 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57466 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:09:30,588 - main - INFO - Request: GET /
+2025-10-24 00:09:30,589 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57467 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:30,592 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:30,596 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57468 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:09:30,689 - main - INFO - Request: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png
+2025-10-24 00:09:30,709 - main - INFO - Response: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:57469 - "GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png HTTP/1.1" 200 OK
+2025-10-24 00:09:31,692 - main - INFO - Request: GET /
+2025-10-24 00:09:31,693 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57472 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:31,702 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:31,708 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57473 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:09:31,721 - main - INFO - Request: GET /
+2025-10-24 00:09:31,722 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57474 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:31,726 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:31,731 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57475 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:09:31,740 - main - INFO - Request: GET /
+2025-10-24 00:09:31,741 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57476 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:31,745 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:31,749 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57477 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:09:31,757 - main - INFO - Request: GET /
+2025-10-24 00:09:31,757 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57478 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:31,768 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:31,773 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57479 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:09:31,779 - main - INFO - Request: GET /
+2025-10-24 00:09:31,780 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57480 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:31,787 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:31,792 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57482 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:09:33,421 - main - INFO - Request: GET /
+2025-10-24 00:09:33,422 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:09:33,424 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57486 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:33,429 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57487 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:09:34,381 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:34,383 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57490 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:34,418 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:34,420 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57491 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:34,449 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:09:34,451 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57492 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:09:35,752 - main - INFO - Request: GET /
+2025-10-24 00:09:35,752 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:09:35,754 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57496 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:35,757 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57497 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:09:36,533 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:36,538 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57500 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:36,584 - main - INFO - Request: GET /
+2025-10-24 00:09:36,585 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57501 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:36,594 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:09:36,616 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:57503 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:09:36,722 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:36,726 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57504 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:40,827 - main - INFO - Request: POST /api/engagements/likes
+2025-10-24 00:09:40,876 - main - INFO - Response: POST /api/engagements/likes - Status: 201 - Time: 0.05s
+INFO:     127.0.0.1:57517 - "POST /api/engagements/likes HTTP/1.1" 201 Created
+2025-10-24 00:09:42,126 - main - INFO - Request: GET /
+2025-10-24 00:09:42,127 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:09:42,128 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57521 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:42,131 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57522 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:09:43,078 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:43,082 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57525 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:43,787 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:43,792 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57527 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:43,826 - main - INFO - Request: GET /
+2025-10-24 00:09:43,828 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57528 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:43,840 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:09:43,861 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:57530 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:09:45,338 - main - INFO - Request: GET /
+2025-10-24 00:09:45,339 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:09:45,340 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57534 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:45,343 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57535 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:09:45,902 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:45,906 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57538 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:45,922 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:09:45,926 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57539 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:09:46,290 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:46,294 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57540 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:47,992 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:47,998 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57550 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:48,021 - main - INFO - Request: GET /
+2025-10-24 00:09:48,022 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57552 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:48,026 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:09:48,046 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:57553 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:09:49,010 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:49,013 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57556 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:49,042 - main - INFO - Request: GET /
+2025-10-24 00:09:49,043 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57557 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:49,058 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:49,064 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57558 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:09:49,075 - main - INFO - Request: GET /
+2025-10-24 00:09:49,076 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57559 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:49,088 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:49,095 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57560 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:09:49,103 - main - INFO - Request: GET /
+2025-10-24 00:09:49,104 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57561 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:49,107 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:49,113 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57562 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:09:49,121 - main - INFO - Request: GET /
+2025-10-24 00:09:49,122 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57563 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:49,125 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:49,129 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57564 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:09:49,138 - main - INFO - Request: GET /
+2025-10-24 00:09:49,138 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57565 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:49,142 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:09:49,146 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57566 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:09:52,482 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:09:52,491 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57574 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:09:52,518 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:09:52,523 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57575 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:09:54,427 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:09:54,432 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57581 - "GET /api/users/search?q=dd HTTP/1.1" 200 OK
+2025-10-24 00:09:55,345 - main - INFO - Request: GET /api/users/1
+2025-10-24 00:09:55,351 - main - INFO - Response: GET /api/users/1 - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57585 - "GET /api/users/1 HTTP/1.1" 200 OK
+2025-10-24 00:09:57,053 - main - INFO - Request: GET /
+2025-10-24 00:09:57,055 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57591 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:09:57,058 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:09:57,065 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57592 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:10:00,388 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:10:00,393 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57600 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:10:03,150 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:10:03,154 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57608 - "GET /api/users/search?q=dd HTTP/1.1" 200 OK
+2025-10-24 00:10:03,618 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:10:03,624 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57609 - "GET /api/users/search?q=ddd HTTP/1.1" 200 OK
+2025-10-24 00:10:03,768 - main - INFO - Request: GET /api/users/1
+2025-10-24 00:10:03,775 - main - INFO - Response: GET /api/users/1 - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57611 - "GET /api/users/1 HTTP/1.1" 200 OK
+2025-10-24 00:10:05,944 - main - INFO - Request: GET /
+2025-10-24 00:10:05,946 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57617 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:10:05,955 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:10:05,959 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57618 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:10:30,400 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:10:30,406 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:57683 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:11:00,415 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:11:00,417 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57777 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:11:30,429 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:11:30,432 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57863 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:12:00,430 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:12:00,433 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:57943 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:12:30,432 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:12:30,437 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58021 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:13:00,427 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:13:00,430 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58112 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:13:30,430 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:13:30,433 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58189 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:14:00,431 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:14:00,436 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58266 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:14:30,434 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:14:30,435 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58358 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:15:00,430 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:15:00,433 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58463 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:15:30,434 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:15:30,438 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58547 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:15:50,710 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:15:50,715 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:58607 - "GET /api/users/search?q=dd HTTP/1.1" 200 OK
+2025-10-24 00:15:51,329 - main - INFO - Request: GET /api/users/1
+2025-10-24 00:15:51,335 - main - INFO - Response: GET /api/users/1 - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:58610 - "GET /api/users/1 HTTP/1.1" 200 OK
+2025-10-24 00:15:53,275 - main - INFO - Request: GET /
+2025-10-24 00:15:53,277 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58615 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:15:53,291 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:15:53,295 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58616 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:15:56,309 - main - INFO - Request: GET /
+2025-10-24 00:15:56,309 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58625 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:15:56,373 - main - INFO - Request: GET /
+2025-10-24 00:15:56,373 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58627 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:15:56,374 - main - INFO - Request: GET /api/wishes/2
+2025-10-24 00:15:56,375 - main - INFO - Response: GET /api/wishes/2 - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58628 - "GET /api/wishes/2 HTTP/1.1" 200 OK
+2025-10-24 00:15:56,389 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:15:56,390 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58629 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:15:56,391 - main - INFO - Request: POST /api/wishes/2/progress
+2025-10-24 00:15:56,394 - main - INFO - Response: POST /api/wishes/2/progress - Status: 404 - Time: 0.00s
+INFO:     127.0.0.1:58630 - "POST /api/wishes/2/progress HTTP/1.1" 404 Not Found
+2025-10-24 00:15:56,421 - main - INFO - Request: GET /api/wishes/1
+2025-10-24 00:15:56,422 - main - INFO - Response: GET /api/wishes/1 - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58631 - "GET /api/wishes/1 HTTP/1.1" 200 OK
+2025-10-24 00:15:56,460 - main - INFO - Request: POST /api/wishes/1/progress
+2025-10-24 00:15:56,462 - main - INFO - Response: POST /api/wishes/1/progress - Status: 404 - Time: 0.00s
+INFO:     127.0.0.1:58632 - "POST /api/wishes/1/progress HTTP/1.1" 404 Not Found
+2025-10-24 00:15:58,108 - main - INFO - Request: GET /
+2025-10-24 00:15:58,109 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58636 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:15:58,118 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:15:58,122 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58637 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:16:00,427 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:16:00,430 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58645 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:16:22,727 - main - INFO - Request: GET /
+2025-10-24 00:16:22,728 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58775 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:16:22,735 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:16:22,738 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58776 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:16:25,268 - main - INFO - Request: GET /
+2025-10-24 00:16:25,269 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58789 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:16:25,274 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:16:25,275 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58790 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:16:30,435 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:16:30,437 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58819 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:16:37,178 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:16:37,182 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58839 - "GET /api/users/search?q=ddd HTTP/1.1" 200 OK
+2025-10-24 00:16:37,772 - main - INFO - Request: GET /api/users/1
+2025-10-24 00:16:37,774 - main - INFO - Response: GET /api/users/1 - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58843 - "GET /api/users/1 HTTP/1.1" 200 OK
+2025-10-24 00:16:39,090 - main - INFO - Request: GET /
+2025-10-24 00:16:39,091 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58847 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:16:39,096 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:16:39,101 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58848 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:17:00,433 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:17:00,436 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:58913 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:17:30,440 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:17:30,443 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59030 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:01,529 - main - INFO - Request: GET /
+2025-10-24 00:18:01,530 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59204 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:01,534 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:01,537 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59205 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:01,885 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:01,889 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59206 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:18:02,060 - main - INFO - Request: GET /
+2025-10-24 00:18:02,062 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59209 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:02,084 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:02,088 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59210 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:18:02,230 - main - INFO - Request: GET /
+2025-10-24 00:18:02,231 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59211 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:02,244 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:02,249 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59212 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:18:02,403 - main - INFO - Request: GET /
+2025-10-24 00:18:02,403 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59213 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:02,487 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:02,492 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59214 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:18:02,510 - main - INFO - Request: GET /
+2025-10-24 00:18:02,511 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59216 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:02,525 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:02,531 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59217 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:18:02,693 - main - INFO - Request: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png
+2025-10-24 00:18:02,696 - main - INFO - Response: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59219 - "GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png HTTP/1.1" 200 OK
+2025-10-24 00:18:24,772 - main - INFO - Request: GET /
+2025-10-24 00:18:24,772 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59280 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:24,778 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:24,784 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59282 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:18:24,824 - main - INFO - Request: GET /
+2025-10-24 00:18:24,825 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59283 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:24,843 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:24,848 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59284 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:18:24,861 - main - INFO - Request: GET /
+2025-10-24 00:18:24,862 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59285 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:24,873 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:24,878 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59286 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:18:24,892 - main - INFO - Request: GET /
+2025-10-24 00:18:24,892 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59287 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:24,897 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:24,902 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59288 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:18:24,913 - main - INFO - Request: GET /
+2025-10-24 00:18:24,914 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59289 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:24,923 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:24,927 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59290 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:18:25,497 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:25,501 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59291 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:25,575 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:18:25,580 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59294 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:18:27,474 - main - INFO - Request: GET /api/users/search
+2025-10-24 00:18:27,478 - main - INFO - Response: GET /api/users/search - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59300 - "GET /api/users/search?q=ddd HTTP/1.1" 200 OK
+2025-10-24 00:18:27,985 - main - INFO - Request: GET /api/users/1
+2025-10-24 00:18:27,990 - main - INFO - Response: GET /api/users/1 - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59303 - "GET /api/users/1 HTTP/1.1" 200 OK
+2025-10-24 00:18:29,938 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:18:29,940 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59313 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:18:29,940 - main - INFO - Request: GET /
+2025-10-24 00:18:29,940 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59314 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:29,999 - main - INFO - Request: GET /api/wishes/1/progress
+2025-10-24 00:18:30,001 - main - INFO - Response: GET /api/wishes/1/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59316 - "GET /api/wishes/1/progress HTTP/1.1" 200 OK
+2025-10-24 00:18:31,348 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:31,352 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59323 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:34,680 - main - INFO - Request: GET /
+2025-10-24 00:18:34,681 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:18:34,681 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59334 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:34,685 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59335 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:18:35,630 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:35,635 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59338 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:35,770 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:35,775 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59339 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:36,507 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:36,510 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59343 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:36,562 - main - INFO - Request: GET /
+2025-10-24 00:18:36,564 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59344 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:36,581 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:18:36,602 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59345 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:18:38,481 - main - INFO - Request: GET /
+2025-10-24 00:18:38,482 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:18:38,483 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59350 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:38,486 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59351 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:18:39,443 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:39,448 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59355 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:39,507 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:39,512 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59356 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:39,985 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:39,989 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59359 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:40,010 - main - INFO - Request: GET /
+2025-10-24 00:18:40,012 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59360 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:40,015 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:18:40,034 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59361 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:18:43,999 - main - INFO - Request: POST /api/engagements/likes
+2025-10-24 00:18:44,020 - main - INFO - Response: POST /api/engagements/likes - Status: 201 - Time: 0.02s
+INFO:     127.0.0.1:59371 - "POST /api/engagements/likes HTTP/1.1" 201 Created
+2025-10-24 00:18:46,186 - main - INFO - Request: GET /
+2025-10-24 00:18:46,187 - main - INFO - Request: GET /api/engagements/wishes/3/comments
+2025-10-24 00:18:46,188 - main - INFO - Request: GET /
+2025-10-24 00:18:46,189 - main - INFO - Request: POST /api/engagements/views
+2025-10-24 00:18:46,190 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59377 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:46,193 - main - INFO - Response: GET / - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59379 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:46,196 - main - INFO - Response: GET /api/engagements/wishes/3/comments - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59378 - "GET /api/engagements/wishes/3/comments HTTP/1.1" 200 OK
+2025-10-24 00:18:46,198 - main - INFO - Request: GET /api/wishes/3/progress
+2025-10-24 00:18:46,199 - main - INFO - Response: POST /api/engagements/views - Status: 201 - Time: 0.01s
+INFO:     127.0.0.1:59380 - "POST /api/engagements/views HTTP/1.1" 201 Created
+2025-10-24 00:18:46,201 - main - INFO - Response: GET /api/wishes/3/progress - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59381 - "GET /api/wishes/3/progress HTTP/1.1" 200 OK
+2025-10-24 00:18:54,154 - main - INFO - Request: POST /api/engagements/likes
+2025-10-24 00:18:54,174 - main - INFO - Response: POST /api/engagements/likes - Status: 201 - Time: 0.02s
+INFO:     127.0.0.1:59403 - "POST /api/engagements/likes HTTP/1.1" 201 Created
+2025-10-24 00:18:55,296 - main - INFO - Request: GET /
+2025-10-24 00:18:55,297 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:18:55,299 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59407 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:55,302 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59408 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:18:56,264 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:56,267 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59412 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:57,204 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:57,205 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:18:57,209 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59415 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:57,213 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59416 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:18:58,588 - main - INFO - Request: GET /
+2025-10-24 00:18:58,589 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:18:58,591 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59420 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:58,594 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59421 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:18:59,131 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:59,134 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59424 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:59,155 - main - INFO - Request: GET /
+2025-10-24 00:18:59,156 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59425 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,160 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:18:59,179 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59426 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:18:59,566 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:59,570 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59427 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:59,848 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:18:59,852 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59429 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:18:59,874 - main - INFO - Request: GET /
+2025-10-24 00:18:59,875 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59430 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,880 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:59,884 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59431 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:18:59,900 - main - INFO - Request: GET /
+2025-10-24 00:18:59,901 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59432 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,911 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:59,916 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59434 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:18:59,926 - main - INFO - Request: GET /
+2025-10-24 00:18:59,927 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59435 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,934 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:59,939 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59436 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:18:59,954 - main - INFO - Request: GET /
+2025-10-24 00:18:59,955 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59437 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,962 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:59,966 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59438 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:18:59,978 - main - INFO - Request: GET /
+2025-10-24 00:18:59,979 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59439 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:18:59,985 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:18:59,989 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59440 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:19:01,045 - main - INFO - Request: GET /
+2025-10-24 00:19:01,046 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59444 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,053 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,058 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59445 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:19:01,074 - main - INFO - Request: GET /
+2025-10-24 00:19:01,075 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59446 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,080 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,085 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59447 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,093 - main - INFO - Request: GET /
+2025-10-24 00:19:01,094 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59448 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,107 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,111 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59449 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,125 - main - INFO - Request: GET /
+2025-10-24 00:19:01,126 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59450 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,133 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,137 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59451 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,145 - main - INFO - Request: GET /
+2025-10-24 00:19:01,146 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59452 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,154 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,159 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59453 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:19:01,347 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:01,352 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59454 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:01,627 - main - INFO - Request: GET /
+2025-10-24 00:19:01,628 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59456 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,639 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,645 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59457 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:19:01,658 - main - INFO - Request: GET /
+2025-10-24 00:19:01,659 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59458 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,664 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,669 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59459 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,678 - main - INFO - Request: GET /
+2025-10-24 00:19:01,678 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59460 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,685 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,689 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59461 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,697 - main - INFO - Request: GET /
+2025-10-24 00:19:01,698 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59462 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,707 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,711 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59463 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:19:01,725 - main - INFO - Request: GET /
+2025-10-24 00:19:01,726 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59464 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:01,731 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:01,735 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59465 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:19:02,114 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:02,118 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59467 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:02,152 - main - INFO - Request: GET /
+2025-10-24 00:19:02,154 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59468 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:02,193 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:02,213 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59469 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:03,148 - main - INFO - Request: GET /
+2025-10-24 00:19:03,149 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59472 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:03,161 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:03,182 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59473 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:03,914 - main - INFO - Request: GET /
+2025-10-24 00:19:03,915 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:19:03,917 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59476 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:03,921 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59477 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:19:04,502 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:04,505 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59479 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:04,517 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:19:04,521 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59480 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:19:04,885 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:04,888 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59482 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:05,654 - main - INFO - Request: GET /
+2025-10-24 00:19:05,655 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:19:05,656 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59485 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:05,660 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59486 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:19:06,638 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:06,643 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59490 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:06,974 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:06,980 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59493 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:07,005 - main - INFO - Request: GET /
+2025-10-24 00:19:07,006 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59494 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:07,010 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:07,027 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59495 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:08,537 - main - INFO - Request: GET /
+2025-10-24 00:19:08,538 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59499 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:08,556 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:08,579 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59500 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:08,710 - main - INFO - Request: GET /
+2025-10-24 00:19:08,711 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59502 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:08,715 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:08,736 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59503 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:08,845 - main - INFO - Request: GET /
+2025-10-24 00:19:08,846 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59504 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:08,852 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:08,873 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59505 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:09,476 - main - INFO - Request: GET /
+2025-10-24 00:19:09,477 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59508 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:09,481 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:09,502 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59509 - "GET /api/wishes/public/feed?filter_type=Popular HTTP/1.1" 200 OK
+2025-10-24 00:19:12,665 - main - INFO - Request: POST /api/engagements/comments
+2025-10-24 00:19:12,679 - main - INFO - Response: POST /api/engagements/comments - Status: 201 - Time: 0.01s
+INFO:     127.0.0.1:59518 - "POST /api/engagements/comments HTTP/1.1" 201 Created
+2025-10-24 00:19:12,740 - main - INFO - Request: GET /
+2025-10-24 00:19:12,742 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59519 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:12,759 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:12,779 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59520 - "GET /api/wishes/public/feed?filter_type=Popular HTTP/1.1" 200 OK
+2025-10-24 00:19:13,541 - main - INFO - Request: GET /
+2025-10-24 00:19:13,542 - main - INFO - Request: GET /api/engagements/wishes/6/comments
+2025-10-24 00:19:13,542 - main - INFO - Request: GET /
+2025-10-24 00:19:13,543 - main - INFO - Request: POST /api/engagements/views
+2025-10-24 00:19:13,544 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59522 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:13,546 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59524 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:13,550 - main - INFO - Response: GET /api/engagements/wishes/6/comments - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59523 - "GET /api/engagements/wishes/6/comments HTTP/1.1" 200 OK
+2025-10-24 00:19:13,552 - main - INFO - Response: POST /api/engagements/views - Status: 201 - Time: 0.01s
+INFO:     127.0.0.1:59525 - "POST /api/engagements/views HTTP/1.1" 201 Created
+2025-10-24 00:19:13,561 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:19:13,569 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59526 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:19:19,573 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:19,574 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:19:19,580 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59541 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:19,581 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59542 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:19:42,315 - main - INFO - Request: POST /api/auth/register
+2025-10-24 00:19:42,363 - app.api.auth - INFO - Registration attempt for email: dell@gmail.com
+2025-10-24 00:19:42,576 - app.api.auth - INFO - User registered successfully: dell@gmail.com
+2025-10-24 00:19:42,576 - main - INFO - Response: POST /api/auth/register - Status: 201 - Time: 0.26s
+INFO:     127.0.0.1:59600 - "POST /api/auth/register HTTP/1.1" 201 Created
+2025-10-24 00:19:42,586 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:19:42,587 - app.api.auth - INFO - Login attempt for email: dell@gmail.com
+2025-10-24 00:19:42,792 - app.api.auth - INFO - User logged in successfully: dell@gmail.com
+2025-10-24 00:19:42,792 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.21s
+INFO:     127.0.0.1:59602 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:19:42,839 - main - INFO - Request: GET /
+2025-10-24 00:19:42,840 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:42,840 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59604 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:42,841 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59605 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:42,849 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:42,850 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59606 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:19:42,882 - main - INFO - Request: GET /
+2025-10-24 00:19:42,882 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59607 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:42,911 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:42,914 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59608 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:19:42,952 - main - INFO - Request: GET /
+2025-10-24 00:19:42,952 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59609 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:42,964 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:42,966 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59610 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:19:43,011 - main - INFO - Request: GET /
+2025-10-24 00:19:43,012 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59611 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:43,022 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:43,026 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59612 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:19:43,041 - main - INFO - Request: GET /
+2025-10-24 00:19:43,042 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59613 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:43,050 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:19:43,053 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59614 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:19:45,084 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:45,089 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59619 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:45,132 - main - INFO - Request: GET /
+2025-10-24 00:19:45,134 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59621 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:45,147 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:45,167 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59622 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:46,112 - main - INFO - Request: GET /
+2025-10-24 00:19:46,113 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59626 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:46,117 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:46,136 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59627 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:49,638 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:49,644 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59636 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:49,697 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:19:49,702 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59637 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:19:50,841 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:50,846 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59641 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:50,873 - main - INFO - Request: GET /
+2025-10-24 00:19:50,874 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59642 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:50,878 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:19:50,894 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59644 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:19:52,507 - main - INFO - Request: POST /api/engagements/likes
+2025-10-24 00:19:52,525 - main - INFO - Response: POST /api/engagements/likes - Status: 201 - Time: 0.02s
+INFO:     127.0.0.1:59649 - "POST /api/engagements/likes HTTP/1.1" 201 Created
+2025-10-24 00:19:54,133 - main - INFO - Request: GET /
+2025-10-24 00:19:54,133 - main - INFO - Request: GET /api/engagements/wishes/6/comments
+2025-10-24 00:19:54,134 - main - INFO - Request: GET /
+2025-10-24 00:19:54,134 - main - INFO - Request: POST /api/engagements/views
+2025-10-24 00:19:54,136 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59654 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:54,136 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59656 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:19:54,141 - main - INFO - Response: GET /api/engagements/wishes/6/comments - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59655 - "GET /api/engagements/wishes/6/comments HTTP/1.1" 200 OK
+2025-10-24 00:19:54,143 - main - INFO - Response: POST /api/engagements/views - Status: 201 - Time: 0.01s
+INFO:     127.0.0.1:59657 - "POST /api/engagements/views HTTP/1.1" 201 Created
+2025-10-24 00:19:54,178 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:19:54,184 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59658 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:19:58,493 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:19:58,498 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59670 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:19:58,524 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:19:58,528 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59671 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:20:10,793 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:20:10,796 - app.api.auth - INFO - Login attempt for email: dd@gmail.com
+2025-10-24 00:20:11,006 - app.api.auth - INFO - User logged in successfully: dd@gmail.com
+2025-10-24 00:20:11,007 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.21s
+INFO:     127.0.0.1:59701 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:20:11,052 - main - INFO - Request: GET /
+2025-10-24 00:20:11,052 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59703 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:11,060 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:20:11,062 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59704 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:20:11,079 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:11,081 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59705 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:20:11,137 - main - INFO - Request: GET /
+2025-10-24 00:20:11,138 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59706 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:11,150 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:11,152 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59707 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:20:11,200 - main - INFO - Request: GET /
+2025-10-24 00:20:11,201 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59709 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:11,218 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:11,221 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59710 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:20:11,233 - main - INFO - Request: GET /
+2025-10-24 00:20:11,234 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59711 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:11,245 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:11,252 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59712 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:20:11,264 - main - INFO - Request: GET /
+2025-10-24 00:20:11,264 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59713 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:11,276 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:11,280 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59714 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:20:12,979 - main - INFO - Request: GET /
+2025-10-24 00:20:12,980 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59719 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:12,993 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:13,000 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59720 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:20:13,014 - main - INFO - Request: GET /
+2025-10-24 00:20:13,015 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59721 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:13,025 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:13,030 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59722 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:20:13,042 - main - INFO - Request: GET /
+2025-10-24 00:20:13,043 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59723 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:13,049 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:13,054 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59724 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:20:13,063 - main - INFO - Request: GET /
+2025-10-24 00:20:13,064 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59725 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:13,070 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:13,074 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59726 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:20:13,081 - main - INFO - Request: GET /
+2025-10-24 00:20:13,082 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59727 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:13,094 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:13,099 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59728 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:20:17,970 - main - INFO - Request: GET /
+2025-10-24 00:20:17,971 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:20:17,973 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59740 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:17,977 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59741 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:20:18,900 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:20:18,904 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59745 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:20:19,293 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:20:19,298 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59747 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:20:20,074 - main - INFO - Request: POST /api/notifications/4/read
+2025-10-24 00:20:20,087 - main - INFO - Response: POST /api/notifications/4/read - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59749 - "POST /api/notifications/4/read HTTP/1.1" 200 OK
+2025-10-24 00:20:20,100 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:20,109 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59750 - "GET /api/wishes HTTP/1.1" 200 OK
+2025-10-24 00:20:20,143 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:20:20,144 - main - INFO - Request: GET /
+2025-10-24 00:20:20,146 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59752 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:20,149 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59751 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:20:20,158 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:20:20,165 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59753 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:20:27,578 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:20:27,584 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59776 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:20:28,737 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:20:28,747 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59779 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:20:28,763 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:20:28,768 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59780 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:20:40,788 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:20:40,792 - app.api.auth - INFO - Login attempt for email: dell2@gmail.com
+2025-10-24 00:20:40,795 - app.api.auth - WARNING - Failed login attempt for email: dell2@gmail.com
+2025-10-24 00:20:40,796 - main - INFO - Response: POST /api/auth/login - Status: 401 - Time: 0.01s
+INFO:     127.0.0.1:59810 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+2025-10-24 00:20:45,332 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:20:45,335 - app.api.auth - INFO - Login attempt for email: dell@gmail.com
+2025-10-24 00:20:45,550 - app.api.auth - INFO - User logged in successfully: dell@gmail.com
+2025-10-24 00:20:45,551 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.22s
+INFO:     127.0.0.1:59822 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:20:45,626 - main - INFO - Request: GET /
+2025-10-24 00:20:45,626 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:20:45,627 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59824 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:45,628 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59825 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:20:45,649 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:45,651 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59826 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:20:45,711 - main - INFO - Request: GET /
+2025-10-24 00:20:45,712 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59827 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:45,730 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:45,732 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59828 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:20:45,764 - main - INFO - Request: GET /
+2025-10-24 00:20:45,764 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59829 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:45,774 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:45,778 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59830 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:20:45,800 - main - INFO - Request: GET /
+2025-10-24 00:20:45,800 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59831 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:45,825 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:45,829 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59832 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:20:45,877 - main - INFO - Request: GET /
+2025-10-24 00:20:45,878 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59834 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:20:45,884 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:20:45,888 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59835 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:21:00,053 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:00,057 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59874 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:00,126 - main - INFO - Request: GET /
+2025-10-24 00:21:00,127 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59875 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:00,132 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:21:00,152 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59876 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:21:04,239 - main - INFO - Request: POST /api/engagements/comments
+2025-10-24 00:21:04,254 - main - INFO - Response: POST /api/engagements/comments - Status: 201 - Time: 0.02s
+INFO:     127.0.0.1:59887 - "POST /api/engagements/comments HTTP/1.1" 201 Created
+2025-10-24 00:21:04,288 - main - INFO - Request: GET /
+2025-10-24 00:21:04,288 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59888 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:04,333 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:21:04,354 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:59889 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:21:06,221 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:06,227 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59894 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:06,248 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:21:06,251 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59895 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:21:15,269 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:21:15,271 - app.api.auth - INFO - Login attempt for email: dd@gmail.com
+2025-10-24 00:21:15,480 - app.api.auth - INFO - User logged in successfully: dd@gmail.com
+2025-10-24 00:21:15,481 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.21s
+INFO:     127.0.0.1:59918 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:21:15,560 - main - INFO - Request: GET /
+2025-10-24 00:21:15,560 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:15,560 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59921 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:15,562 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59922 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:15,578 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:15,580 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59923 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:21:15,635 - main - INFO - Request: GET /
+2025-10-24 00:21:15,636 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59924 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:15,647 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:15,649 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59925 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:21:15,701 - main - INFO - Request: GET /
+2025-10-24 00:21:15,701 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59926 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:15,717 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:15,722 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59927 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:21:15,734 - main - INFO - Request: GET /
+2025-10-24 00:21:15,735 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59928 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:15,751 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:15,755 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59929 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:21:15,782 - main - INFO - Request: GET /
+2025-10-24 00:21:15,783 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59930 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:15,799 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:15,804 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59931 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:21:16,928 - main - INFO - Request: GET /
+2025-10-24 00:21:16,929 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:21:16,931 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59935 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:16,936 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59936 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:21:17,905 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:17,910 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59939 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:18,061 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:21:18,068 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59940 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:21:19,565 - main - INFO - Request: POST /api/notifications/5/read
+2025-10-24 00:21:19,572 - main - INFO - Response: POST /api/notifications/5/read - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59945 - "POST /api/notifications/5/read HTTP/1.1" 200 OK
+2025-10-24 00:21:19,580 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:21:19,589 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59946 - "GET /api/wishes HTTP/1.1" 200 OK
+2025-10-24 00:21:19,620 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:21:19,621 - main - INFO - Request: GET /
+2025-10-24 00:21:19,623 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59948 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:19,625 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59947 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:21:19,643 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:21:19,650 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59949 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:21:22,162 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:21:22,167 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59957 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:21:23,090 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:23,096 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59960 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:23,113 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:21:23,117 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59961 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:21:23,872 - main - INFO - Request: GET /
+2025-10-24 00:21:23,873 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:21:23,875 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59963 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:21:23,880 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:59964 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:21:24,865 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:24,869 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:59968 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:21:45,538 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:21:45,544 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60033 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:02,711 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:02,718 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60092 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:02,781 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:22:02,785 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60093 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:22:24,298 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:22:24,300 - app.api.auth - INFO - Login attempt for email: dd@gmail.com
+2025-10-24 00:22:24,518 - app.api.auth - INFO - User logged in successfully: dd@gmail.com
+2025-10-24 00:22:24,518 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.22s
+INFO:     127.0.0.1:60154 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:22:24,594 - main - INFO - Request: GET /
+2025-10-24 00:22:24,595 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60156 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:24,596 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:24,598 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60157 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:24,615 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:24,617 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60158 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:24,689 - main - INFO - Request: GET /
+2025-10-24 00:22:24,689 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60161 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:24,727 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:24,731 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60162 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:24,811 - main - INFO - Request: GET /
+2025-10-24 00:22:24,812 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60163 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:24,847 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:24,853 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60164 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:24,927 - main - INFO - Request: GET /
+2025-10-24 00:22:24,928 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60165 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:24,939 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:24,944 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60166 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:24,967 - main - INFO - Request: GET /
+2025-10-24 00:22:24,968 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60167 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:24,981 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:24,986 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60168 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:22:26,055 - main - INFO - Request: GET /
+2025-10-24 00:22:26,057 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60172 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:26,065 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:26,071 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60173 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:26,084 - main - INFO - Request: GET /
+2025-10-24 00:22:26,085 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60174 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:26,095 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:26,100 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60176 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:26,116 - main - INFO - Request: GET /
+2025-10-24 00:22:26,117 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60177 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:26,128 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:26,134 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60178 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:26,150 - main - INFO - Request: GET /
+2025-10-24 00:22:26,151 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60179 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:26,160 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:26,164 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60180 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:26,170 - main - INFO - Request: GET /
+2025-10-24 00:22:26,170 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60181 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:26,180 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:26,183 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60182 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:22:26,832 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:26,835 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60185 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:26,865 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:22:26,870 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60186 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:22:29,317 - main - INFO - Request: GET /
+2025-10-24 00:22:29,318 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:22:29,320 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60193 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:29,325 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60194 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:22:30,164 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:22:30,170 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60197 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:22:30,274 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:30,277 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60198 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:30,750 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:30,762 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60201 - "GET /api/wishes HTTP/1.1" 200 OK
+2025-10-24 00:22:30,800 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:22:30,801 - main - INFO - Request: GET /
+2025-10-24 00:22:30,804 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60203 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:30,806 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60202 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:22:30,827 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:22:30,834 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60204 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:22:32,862 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:22:32,867 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60209 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:22:45,703 - main - INFO - Request: POST /api/auth/login
+2025-10-24 00:22:45,705 - app.api.auth - INFO - Login attempt for email: dd@gmail.com
+2025-10-24 00:22:45,922 - app.api.auth - INFO - User logged in successfully: dd@gmail.com
+2025-10-24 00:22:45,922 - main - INFO - Response: POST /api/auth/login - Status: 200 - Time: 0.22s
+INFO:     127.0.0.1:60258 - "POST /api/auth/login HTTP/1.1" 200 OK
+2025-10-24 00:22:45,987 - main - INFO - Request: GET /
+2025-10-24 00:22:45,987 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60260 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:45,988 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:45,990 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60261 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:46,013 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:46,016 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60262 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:46,079 - main - INFO - Request: GET /
+2025-10-24 00:22:46,080 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60264 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:46,094 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:46,097 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60265 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:46,159 - main - INFO - Request: GET /
+2025-10-24 00:22:46,160 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60266 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:46,170 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:46,175 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60267 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:46,234 - main - INFO - Request: GET /
+2025-10-24 00:22:46,234 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60268 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:46,248 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:46,252 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60269 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:46,278 - main - INFO - Request: GET /
+2025-10-24 00:22:46,279 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60270 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:46,286 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:46,291 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60271 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:22:46,984 - main - INFO - Request: GET /
+2025-10-24 00:22:46,985 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60274 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:46,997 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:47,003 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60275 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:47,017 - main - INFO - Request: GET /
+2025-10-24 00:22:47,018 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60276 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:47,027 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:47,032 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60277 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:47,045 - main - INFO - Request: GET /
+2025-10-24 00:22:47,046 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60278 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:47,052 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:47,057 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60279 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:47,066 - main - INFO - Request: GET /
+2025-10-24 00:22:47,067 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60280 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:47,076 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:47,080 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60281 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:47,086 - main - INFO - Request: GET /
+2025-10-24 00:22:47,087 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60283 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:47,095 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:47,100 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60284 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:22:47,295 - main - INFO - Request: GET /
+2025-10-24 00:22:47,296 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60285 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:47,297 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:22:47,303 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60286 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:22:48,281 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:48,285 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60289 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:49,398 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:49,409 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60294 - "GET /api/wishes HTTP/1.1" 200 OK
+2025-10-24 00:22:49,442 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:22:49,443 - main - INFO - Request: GET /
+2025-10-24 00:22:49,445 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60296 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:49,447 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60295 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:22:49,456 - main - INFO - Request: GET /api/wishes/6/progress
+2025-10-24 00:22:49,462 - main - INFO - Response: GET /api/wishes/6/progress - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60297 - "GET /api/wishes/6/progress HTTP/1.1" 200 OK
+2025-10-24 00:22:53,899 - main - INFO - Request: GET /
+2025-10-24 00:22:53,901 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60309 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:53,903 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:53,906 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60310 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:54,173 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:54,178 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60311 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:54,275 - main - INFO - Request: GET /
+2025-10-24 00:22:54,277 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60313 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:54,306 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:54,313 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60314 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:54,381 - main - INFO - Request: GET /
+2025-10-24 00:22:54,382 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60315 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:54,398 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:54,403 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60316 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:54,451 - main - INFO - Request: GET /
+2025-10-24 00:22:54,453 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60317 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:54,469 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:54,474 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60318 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:54,494 - main - INFO - Request: GET /
+2025-10-24 00:22:54,495 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60319 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:54,530 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:54,537 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60320 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:22:54,784 - main - INFO - Request: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png
+2025-10-24 00:22:54,786 - main - INFO - Response: GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60322 - "GET /uploads/b06d962e-5556-4626-8993-3a7eeef617da_scaled_18.png HTTP/1.1" 200 OK
+2025-10-24 00:22:55,468 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:55,472 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60325 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:55,513 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:22:55,517 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60326 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:22:57,311 - main - INFO - Request: GET /
+2025-10-24 00:22:57,311 - main - INFO - Request: GET /api/notifications/
+2025-10-24 00:22:57,312 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60331 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:57,316 - main - INFO - Response: GET /api/notifications/ - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60332 - "GET /api/notifications/ HTTP/1.1" 200 OK
+2025-10-24 00:22:57,883 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:57,888 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60336 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:58,280 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:58,284 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60338 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:58,520 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:58,524 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60339 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:58,569 - main - INFO - Request: GET /
+2025-10-24 00:22:58,571 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60340 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:58,601 - main - INFO - Request: GET /api/wishes/public/feed
+2025-10-24 00:22:58,622 - main - INFO - Response: GET /api/wishes/public/feed - Status: 200 - Time: 0.02s
+INFO:     127.0.0.1:60341 - "GET /api/wishes/public/feed HTTP/1.1" 200 OK
+2025-10-24 00:22:59,212 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:22:59,217 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60344 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:22:59,248 - main - INFO - Request: GET /
+2025-10-24 00:22:59,250 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60345 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:59,256 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:59,261 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60346 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:22:59,277 - main - INFO - Request: GET /
+2025-10-24 00:22:59,278 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60347 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:59,283 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:59,289 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60348 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:22:59,301 - main - INFO - Request: GET /
+2025-10-24 00:22:59,302 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60349 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:59,314 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:59,320 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60350 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:22:59,335 - main - INFO - Request: GET /
+2025-10-24 00:22:59,335 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60351 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:59,347 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:59,352 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60352 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:22:59,364 - main - INFO - Request: GET /
+2025-10-24 00:22:59,365 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60353 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:22:59,370 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:22:59,374 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60354 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:23:00,284 - main - INFO - Request: GET /
+2025-10-24 00:23:00,285 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60357 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:23:00,298 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:23:00,304 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60358 - "GET /api/wishes?status_filter=current HTTP/1.1" 200 OK
+2025-10-24 00:23:00,317 - main - INFO - Request: GET /
+2025-10-24 00:23:00,318 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60359 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:23:00,331 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:23:00,338 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60360 - "GET /api/wishes?status_filter=completed HTTP/1.1" 200 OK
+2025-10-24 00:23:00,352 - main - INFO - Request: GET /
+2025-10-24 00:23:00,353 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60361 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:23:00,364 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:23:00,369 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60362 - "GET /api/wishes?status_filter=failed HTTP/1.1" 200 OK
+2025-10-24 00:23:00,382 - main - INFO - Request: GET /
+2025-10-24 00:23:00,383 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60363 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:23:00,390 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:23:00,394 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60364 - "GET /api/wishes?status_filter=missed HTTP/1.1" 200 OK
+2025-10-24 00:23:00,401 - main - INFO - Request: GET /
+2025-10-24 00:23:00,402 - main - INFO - Response: GET / - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60365 - "GET / HTTP/1.1" 200 OK
+2025-10-24 00:23:00,414 - main - INFO - Request: GET /api/wishes
+2025-10-24 00:23:00,419 - main - INFO - Response: GET /api/wishes - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60366 - "GET /api/wishes?status_filter=archived HTTP/1.1" 200 OK
+2025-10-24 00:23:05,215 - main - INFO - Request: GET /uploads/813cf966-f8c8-4200-b41a-3f6e7d48044f_scaled_18.png
+2025-10-24 00:23:05,217 - main - INFO - Response: GET /uploads/813cf966-f8c8-4200-b41a-3f6e7d48044f_scaled_18.png - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60379 - "GET /uploads/813cf966-f8c8-4200-b41a-3f6e7d48044f_scaled_18.png HTTP/1.1" 200 OK
+2025-10-24 00:23:05,814 - main - INFO - Request: GET /uploads/07950ae0-be09-4c19-801b-32c88235faad_scaled_18.png
+2025-10-24 00:23:05,815 - main - INFO - Response: GET /uploads/07950ae0-be09-4c19-801b-32c88235faad_scaled_18.png - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60379 - "GET /uploads/07950ae0-be09-4c19-801b-32c88235faad_scaled_18.png HTTP/1.1" 200 OK
+2025-10-24 00:23:08,174 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:23:08,180 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60388 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:23:08,218 - main - INFO - Request: GET /api/users/me
+2025-10-24 00:23:08,222 - main - INFO - Response: GET /api/users/me - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60389 - "GET /api/users/me HTTP/1.1" 200 OK
+2025-10-24 00:23:15,251 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:23:15,256 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.01s
+INFO:     127.0.0.1:60409 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:23:23,740 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:23:23,743 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60433 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK
+2025-10-24 00:23:53,736 - main - INFO - Request: GET /api/notifications/unread-count
+2025-10-24 00:23:53,738 - main - INFO - Response: GET /api/notifications/unread-count - Status: 200 - Time: 0.00s
+INFO:     127.0.0.1:60541 - "GET /api/notifications/unread-count HTTP/1.1" 200 OK

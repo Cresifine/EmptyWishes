@@ -26,18 +26,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
+    print('[ProfileScreen] Loading user data...');
     final isOffline = await StorageService.isOfflineMode();
+    print('[ProfileScreen] Offline mode: $isOffline');
+    
+    // Try to get fresh user data from API
     final userData = await AuthService.getCurrentUser();
+    print('[ProfileScreen] User data from API: $userData');
+    
+    // If no user data from API, try cached data
+    Map<String, dynamic>? finalUserData = userData;
+    if (finalUserData == null) {
+      print('[ProfileScreen] No API data, checking cache...');
+      finalUserData = await StorageService.getUser();
+      print('[ProfileScreen] Cached user data: $finalUserData');
+    }
+    
     final pendingWishes = await StorageService.getPendingWishes();
     
     if (mounted) {
       setState(() {
         _isOfflineMode = isOffline;
-        _userData = userData;
-        _userStats = userData?['statistics'] ?? {};
+        _userData = finalUserData;
+        _userStats = finalUserData?['statistics'] ?? {};
         _pendingWishesCount = pendingWishes?.length ?? 0;
         _isLoading = false;
       });
+      
+      print('[ProfileScreen] Final user data set: $_userData');
     }
   }
 
@@ -354,6 +370,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            
+            // Settings Section
+            if (!_isOfflineMode) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _SettingsCard(onSyncComplete: _loadUserData),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            
             Padding(
               padding: const EdgeInsets.all(16),
               child: _isOfflineMode
@@ -386,6 +426,162 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatefulWidget {
+  final VoidCallback onSyncComplete;
+
+  const _SettingsCard({required this.onSyncComplete});
+
+  @override
+  State<_SettingsCard> createState() => _SettingsCardState();
+}
+
+class _SettingsCardState extends State<_SettingsCard> {
+  bool _autoSyncEnabled = true;
+  bool _isSyncing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final autoSync = await StorageService.isAutoSyncEnabled();
+    if (mounted) {
+      setState(() => _autoSyncEnabled = autoSync);
+    }
+  }
+
+  Future<void> _toggleAutoSync(bool value) async {
+    await StorageService.setAutoSync(value);
+    setState(() => _autoSyncEnabled = value);
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(value ? 'Auto-sync enabled' : 'Auto-sync disabled'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _manualSync() async {
+    setState(() => _isSyncing = true);
+    
+    print('[Settings] ===== Manual sync triggered =====');
+    
+    // Count pending items before sync
+    final pendingWishes = await StorageService.getPendingWishes();
+    final pendingUpdates = await StorageService.getPendingProgressUpdates();
+    final pendingWishCount = pendingWishes?.length ?? 0;
+    final pendingUpdateCount = pendingUpdates?.length ?? 0;
+    
+    print('[Settings] Pending wishes: $pendingWishCount');
+    print('[Settings] Pending progress updates: $pendingUpdateCount');
+    
+    await SyncService.backgroundSync();
+    
+    // Count remaining pending items after sync
+    final remainingWishes = await StorageService.getPendingWishes();
+    final remainingUpdates = await StorageService.getPendingProgressUpdates();
+    final remainingWishCount = remainingWishes?.length ?? 0;
+    final remainingUpdateCount = remainingUpdates?.length ?? 0;
+    
+    print('[Settings] Remaining wishes: $remainingWishCount');
+    print('[Settings] Remaining progress updates: $remainingUpdateCount');
+    
+    if (mounted) {
+      setState(() => _isSyncing = false);
+      
+      final syncedWishes = pendingWishCount - remainingWishCount;
+      final syncedUpdates = pendingUpdateCount - remainingUpdateCount;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Sync completed!\n'
+            'Wishes: $syncedWishes synced, $remainingWishCount pending\n'
+            'Updates: $syncedUpdates synced, $remainingUpdateCount pending'
+          ),
+          backgroundColor: (remainingWishCount == 0 && remainingUpdateCount == 0) 
+              ? Colors.green 
+              : Colors.orange,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      widget.onSyncComplete();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Auto-Sync Toggle
+            Row(
+              children: [
+                Icon(
+                  Icons.sync_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Auto-Sync',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'Automatically sync when online',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: _autoSyncEnabled,
+                  onChanged: _toggleAutoSync,
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            // Manual Sync Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isSyncing ? null : _manualSync,
+                icon: _isSyncing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.cloud_upload_rounded),
+                label: Text(_isSyncing ? 'Syncing...' : 'Manual Sync Now'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

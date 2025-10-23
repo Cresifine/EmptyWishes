@@ -1,5 +1,6 @@
 class Wish {
   final int id;
+  final int userId;
   final String title;
   final String description;
   final int progress;
@@ -12,6 +13,7 @@ class Wish {
 
   Wish({
     required this.id,
+    required this.userId,
     required this.title,
     required this.description,
     required this.progress,
@@ -26,6 +28,7 @@ class Wish {
   factory Wish.fromJson(Map<String, dynamic> json) {
     return Wish(
       id: json['id'],
+      userId: json['user_id'] ?? 1,
       title: json['title'],
       description: json['description'] ?? '',
       progress: json['progress'] ?? 0,
@@ -43,6 +46,7 @@ class Wish {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'user_id': userId,
       'title': title,
       'description': description,
       'progress': progress,

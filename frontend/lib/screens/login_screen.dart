@@ -25,32 +25,77 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      // Show loading
+      // Show loading dialog
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  'Logging in...',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
 
-      final success = await AuthService.login(
-        _emailController.text,
-        _passwordController.text,
-      );
+      try {
+        final success = await AuthService.login(
+          _emailController.text,
+          _passwordController.text,
+        ).timeout(
+          const Duration(seconds: 6),
+          onTimeout: () {
+            print('[LoginScreen] Login timeout');
+            return false;
+          },
+        );
 
-      if (mounted) Navigator.pop(context); // Close loading
+        if (mounted) Navigator.pop(context); // Close loading
 
-      if (success) {
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const MainScreen()),
-          );
+        if (success) {
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MainScreen()),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login failed. Check your credentials and internet connection.'),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 4),
+              ),
+            );
+          }
         }
-      } else {
+      } catch (e) {
+        print('[LoginScreen] Login error: $e');
         if (mounted) {
+          Navigator.pop(context); // Close loading
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Login failed. Please check your credentials.'),
+              content: Text('Network error. Please check your connection.'),
               backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
             ),
           );
         }

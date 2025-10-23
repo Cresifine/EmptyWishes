@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'storage_service.dart';
 import 'auth_service.dart';
 import '../models/wish.dart';
+import 'progress_update_service.dart';
 
 class SyncService {
   static const String baseUrl = 'http://10.0.2.2:8000';
@@ -52,22 +54,63 @@ class SyncService {
 
   static Future<bool> _syncSingleWish(Map<String, dynamic> wish, String token) async {
     try {
-      print('[SyncService] Syncing wish: ${wish['title']}');
-      final response = await http.post(
+      final localId = wish['id'];
+      print('[SyncService] Syncing wish: ${wish['title']} (local ID: $localId)');
+      
+      // Backend expects Form data, not JSON
+      final request = http.MultipartRequest(
+        'POST',
         Uri.parse('$baseUrl/api/wishes'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'title': wish['title'],
-          'description': wish['description'],
-          'target_date': wish['target_date'],
-        }),
       );
+      
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['title'] = wish['title'] ?? '';
+      request.fields['description'] = wish['description'] ?? '';
+      
+      if (wish['target_date'] != null) {
+        request.fields['target_date'] = wish['target_date'];
+      }
+      
+      if (wish['consequence'] != null && wish['consequence'].toString().isNotEmpty) {
+        request.fields['consequence'] = wish['consequence'];
+      }
+
+      // Add local cover image if exists
+      if (wish['local_cover_image'] != null) {
+        final coverImagePath = wish['local_cover_image'];
+        final coverImageFile = File(coverImagePath);
+        
+        if (await coverImageFile.exists()) {
+          print('[SyncService] Adding cover image to sync: $coverImagePath');
+          final fileStream = http.ByteStream(coverImageFile.openRead());
+          final fileLength = await coverImageFile.length();
+          final fileName = coverImagePath.split('/').last;
+          
+          final multipartFile = http.MultipartFile(
+            'cover_image',
+            fileStream,
+            fileLength,
+            filename: fileName,
+          );
+          request.files.add(multipartFile);
+        } else {
+          print('[SyncService] Local cover image not found: $coverImagePath');
+        }
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+        final backendId = responseData['id'];
+        
         print('[SyncService] Successfully synced wish: ${wish['title']}');
+        print('[SyncService] Local ID: $localId → Backend ID: $backendId');
+        
+        // Update progress updates that reference the old local ID
+        await _updateProgressUpdateWishIds(localId, backendId);
+        
         return true;
       } else {
         print('[SyncService] Failed to sync wish: ${wish['title']}, Status: ${response.statusCode}, Body: ${response.body}');
@@ -77,6 +120,29 @@ class SyncService {
       print('[SyncService] Error syncing wish: ${wish['title']}, Error: $e');
       print('[SyncService] Stack trace: $stackTrace');
       return false;
+    }
+  }
+
+  /// Update progress updates to use the new backend wish ID
+  static Future<void> _updateProgressUpdateWishIds(int oldLocalId, int newBackendId) async {
+    try {
+      final pendingUpdates = await StorageService.getPendingProgressUpdates();
+      if (pendingUpdates == null || pendingUpdates.isEmpty) return;
+      
+      int updatedCount = 0;
+      for (var update in pendingUpdates) {
+        if (update['wish_id'] == oldLocalId) {
+          update['wish_id'] = newBackendId;
+          updatedCount++;
+        }
+      }
+      
+      if (updatedCount > 0) {
+        await StorageService.savePendingProgressUpdates(pendingUpdates);
+        print('[SyncService] Updated $updatedCount progress updates from wish ID $oldLocalId to $newBackendId');
+      }
+    } catch (e) {
+      print('[SyncService] Error updating progress update wish IDs: $e');
     }
   }
 
@@ -105,12 +171,21 @@ class SyncService {
 
   // Background sync - called periodically
   static Future<void> backgroundSync() async {
+    print('[SyncService] Starting background sync');
     final hasToken = await StorageService.hasToken();
-    if (!hasToken) return;
+    if (!hasToken) {
+      print('[SyncService] No token, skipping sync');
+      return;
+    }
     
     final online = await isOnline();
+    print('[SyncService] Online status: $online');
     if (online) {
+      print('[SyncService] Syncing wishes...');
       await syncPendingWishes();
+      print('[SyncService] Syncing progress updates...');
+      await ProgressUpdateService.syncPendingUpdates();
+      print('[SyncService] Background sync complete');
     }
   }
 
@@ -141,8 +216,21 @@ class SyncService {
         final wishes = data.map((w) => w as Map<String, dynamic>).toList();
         print('[SyncService] Successfully fetched ${wishes.length} wishes from backend');
         
-        // Cache for offline use
-        await StorageService.cacheWishes(wishes);
+        // Cache for offline use - merge with existing cache instead of replacing
+        if (status != null) {
+          // If fetching specific status, merge with existing cache
+          final existingCache = await StorageService.getCachedWishes() ?? [];
+          // Remove old wishes with same status
+          final filteredCache = existingCache.where((w) => w['status'] != status).toList();
+          // Add new wishes
+          final mergedCache = [...filteredCache, ...wishes];
+          await StorageService.cacheWishes(mergedCache);
+          print('[SyncService] Merged ${wishes.length} wishes into cache (total: ${mergedCache.length})');
+        } else {
+          // If fetching all wishes, replace entire cache
+          await StorageService.cacheWishes(wishes);
+          print('[SyncService] Cached ${wishes.length} wishes');
+        }
         
         return wishes;
       } else {

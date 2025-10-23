@@ -1,6 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'storage_service.dart';
 import 'sync_service.dart';
 import '../models/wish.dart';
@@ -8,7 +10,34 @@ import '../models/wish.dart';
 class WishService {
   static const String baseUrl = 'http://10.0.2.2:8000';
 
-  // Create wish (online with file upload or offline)
+  /// Get local storage directory for wish cover images
+  static Future<Directory> _getLocalStorageDir() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final wishesDir = Directory('${appDir.path}/wishes');
+    if (!await wishesDir.exists()) {
+      await wishesDir.create(recursive: true);
+    }
+    return wishesDir;
+  }
+
+  /// Copy cover image to local storage
+  static Future<String?> _copyCoverImageToLocalStorage(File? coverImage, int wishId) async {
+    if (coverImage == null) return null;
+    
+    try {
+      final storageDir = await _getLocalStorageDir();
+      final fileName = path.basename(coverImage.path);
+      final localPath = '${storageDir.path}/${wishId}_$fileName';
+      final localFile = await coverImage.copy(localPath);
+      print('[WishService] Copied cover image to local storage: $localPath');
+      return localFile.path;
+    } catch (e) {
+      print('[WishService] Error copying cover image: $e');
+      return null;
+    }
+  }
+
+  // Create wish (PURELY LOCAL - offline-first approach)
   static Future<bool> createWish({
     required String title,
     required String description,
@@ -17,52 +46,17 @@ class WishService {
     File? coverImage,
   }) async {
     try {
-      final hasToken = await StorageService.hasToken();
-      final online = await SyncService.isOnline();
+      print('[WishService] Creating wish locally: $title');
       
-      // If online with token and has cover image, upload directly
-      if (online && hasToken && coverImage != null) {
-        final token = await StorageService.getToken();
-        if (token != null) {
-          final request = http.MultipartRequest(
-            'POST',
-            Uri.parse('$baseUrl/api/wishes'),
-          );
-
-          request.headers['Authorization'] = 'Bearer $token';
-          request.fields['title'] = title;
-          request.fields['description'] = description;
-          if (targetDate != null) {
-            request.fields['target_date'] = targetDate.toIso8601String();
-          }
-          if (consequence != null && consequence.isNotEmpty) {
-            request.fields['consequence'] = consequence;
-          }
-
-          // Add cover image file
-          final fileStream = http.ByteStream(coverImage.openRead());
-          final fileLength = await coverImage.length();
-          final multipartFile = http.MultipartFile(
-            'cover_image',
-            fileStream,
-            fileLength,
-            filename: coverImage.path.split('/').last,
-          );
-          request.files.add(multipartFile);
-
-          final streamedResponse = await request.send();
-          final response = await http.Response.fromStream(streamedResponse);
-
-          if (response.statusCode == 201) {
-            print('[WishService] Successfully created wish with cover image');
-            return true;
-          } else {
-            print('[WishService] Failed to create wish: ${response.body}');
-          }
-        }
+      final wishId = DateTime.now().millisecondsSinceEpoch;
+      
+      // Copy cover image to local storage if provided
+      String? localCoverImagePath;
+      if (coverImage != null) {
+        localCoverImagePath = await _copyCoverImageToLocalStorage(coverImage, wishId);
       }
       
-      // Fallback to offline-first approach (without image for now)
+      // ALWAYS store locally first (offline-first)
       final wishData = {
         'title': title,
         'description': description,
@@ -70,49 +64,80 @@ class WishService {
         'consequence': consequence,
         'progress': 0,
         'is_completed': false,
+        'status': 'current',
         'created_at': DateTime.now().toIso8601String(),
-        'id': DateTime.now().millisecondsSinceEpoch, // Temporary local ID
+        'id': wishId, // Temporary local ID
+        'local_cover_image': localCoverImagePath, // Store local path
+        'synced': false,
       };
 
-      // Always store locally first
       await SyncService.addToPendingSync(wishData);
+      print('[WishService] Wish stored locally with ID: $wishId');
       
-      // Try to sync if online and has token
+      // Try to sync in background if online and authenticated
+      final hasToken = await StorageService.hasToken();
+      final online = await SyncService.isOnline();
+      
       if (hasToken && online) {
-        // Sync in background, don't wait for result
-        SyncService.syncPendingWishes();
+        print('[WishService] Attempting background sync');
+        SyncService.syncPendingWishes(); // Fire and forget
+      } else {
+        print('[WishService] Offline or not authenticated - will sync later');
       }
       
       return true;
     } catch (e) {
-      print('Error creating wish: $e');
+      print('[WishService] Error creating wish: $e');
       return false;
     }
   }
 
   // Get all wishes (offline-first)
   static Future<List<Wish>> getWishesByStatus(String status) async {
+    print('[WishService] Getting wishes by status: $status');
     final isOnline = await SyncService.isOnline();
     final isAuthenticated = await StorageService.hasToken();
+    final isOfflineMode = await StorageService.isOfflineMode();
 
-    if (isOnline && isAuthenticated) {
-      final wishData = await SyncService.fetchWishesFromBackend(status: status);
-      if (wishData != null) {
-        return wishData.map((json) => Wish.fromJson(json)).toList();
-      }
-    }
+    print('[WishService] Online: $isOnline, Auth: $isAuthenticated, OfflineMode: $isOfflineMode');
 
-    // Offline mode - return cached wishes filtered by status
+    // Always get cached and pending wishes
     final cachedWishes = await StorageService.getCachedWishes() ?? [];
     final pendingWishes = await StorageService.getPendingWishes() ?? [];
 
-    // Convert JSON to Wish objects
-    final cachedWishObjects = cachedWishes.map((json) => Wish.fromJson(json)).toList();
-    final pendingWishObjects = pendingWishes.map((json) => Wish.fromJson(json)).toList();
+    print('[WishService] Cached: ${cachedWishes.length}, Pending: ${pendingWishes.length}');
+
+    // If online and authenticated, fetch fresh data from backend (it will update cache)
+    if (isOnline && isAuthenticated && !isOfflineMode) {
+      final wishData = await SyncService.fetchWishesFromBackend(status: status);
+      if (wishData != null) {
+        print('[WishService] Fetched ${wishData.length} wishes from backend');
+        // Backend data is already cached by SyncService
+        // Merge with pending wishes that haven't synced yet
+        final backendWishObjects = wishData.map((json) => Wish.fromJson(json)).toList();
+        final pendingWishObjects = pendingWishes
+            .where((w) => w['status'] == status && w['synced'] != true)
+            .map((json) => Wish.fromJson(json))
+            .toList();
+        
+        return [...backendWishObjects, ...pendingWishObjects];
+      }
+    }
+
+    // Offline mode or fetch failed - use cached + pending wishes
+    print('[WishService] Using cached/pending wishes (offline or fetch failed)');
+    final cachedWishObjects = cachedWishes
+        .where((w) => w['status'] == status)
+        .map((json) => Wish.fromJson(json))
+        .toList();
+    final pendingWishObjects = pendingWishes
+        .where((w) => w['status'] == status)
+        .map((json) => Wish.fromJson(json))
+        .toList();
     
-    // Combine and filter by status
-    final List<Wish> allWishes = [...cachedWishObjects, ...pendingWishObjects];
-    return allWishes.where((wish) => wish.status == status).toList();
+    final allWishes = [...cachedWishObjects, ...pendingWishObjects];
+    print('[WishService] Returning ${allWishes.length} wishes for status $status');
+    return allWishes;
   }
 
   static Future<List<Wish>> getWishes() async {

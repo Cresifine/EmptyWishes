@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 import 'storage_service.dart';
 import 'sync_service.dart';
 
@@ -8,6 +9,7 @@ class AuthService {
 
   static Future<bool> login(String email, String password) async {
     try {
+      print('[AuthService] Attempting login to: $baseUrl/api/auth/login');
       final response = await http.post(
         Uri.parse('$baseUrl/api/auth/login'),
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -15,21 +17,39 @@ class AuthService {
           'email': email,
           'password': password,
         },
+      ).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          print('[AuthService] Login request timed out');
+          throw TimeoutException('Connection timeout');
+        },
       );
 
+      print('[AuthService] Login response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         await StorageService.saveToken(data['access_token']);
         await StorageService.setOfflineMode(false);
         
-        // Sync pending offline wishes
-        await SyncService.syncPendingWishes();
+        print('[AuthService] Login successful, syncing data...');
+        // Sync all pending offline data if auto-sync is enabled
+        final autoSyncEnabled = await StorageService.isAutoSyncEnabled();
+        if (autoSyncEnabled) {
+          print('[AuthService] Auto-sync enabled, syncing pending data');
+          await SyncService.backgroundSync();
+        } else {
+          print('[AuthService] Auto-sync disabled, skipping automatic sync');
+        }
         
         return true;
       }
+      print('[AuthService] Login failed with status: ${response.statusCode}');
+      return false;
+    } on TimeoutException catch (e) {
+      print('[AuthService] Login timeout error: $e');
       return false;
     } catch (e) {
-      print('Login error: $e');
+      print('[AuthService] Login error: $e');
       return false;
     }
   }
@@ -75,32 +95,50 @@ class AuthService {
 
   static Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
+      print('[AuthService] Getting current user...');
       final token = await StorageService.getToken();
-      if (token == null) return null;
+      if (token == null) {
+        print('[AuthService] No token found');
+        return await StorageService.getUser(); // Return cached user
+      }
 
+      print('[AuthService] Token found, calling API...');
       final response = await http.get(
         Uri.parse('$baseUrl/api/users/me'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(const Duration(seconds: 5));
+
+      print('[AuthService] API response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
+        print('[AuthService] User data received: ${userData['username']}, ${userData['email']}');
         await StorageService.saveUser(userData);
         return userData;
+      } else {
+        print('[AuthService] API returned error: ${response.statusCode}, ${response.body}');
+        // Return cached user if API fails
+        return await StorageService.getUser();
       }
-      return null;
     } catch (e) {
-      print('Get user error: $e');
+      print('[AuthService] Get user error: $e');
       // Return cached user if offline
-      return await StorageService.getUser();
+      final cachedUser = await StorageService.getUser();
+      print('[AuthService] Returning cached user: $cachedUser');
+      return cachedUser;
     }
   }
 
   static Future<void> logout() async {
-    await StorageService.clearAll();
+    print('[AuthService] Logging out - preserving local data');
+    // Only clear auth-related data, keep ALL local wishes/updates/files
+    await StorageService.deleteToken();
+    await StorageService.deleteUser();
+    await StorageService.setOfflineMode(true);
+    print('[AuthService] Logout complete - all local data preserved');
   }
 
   static Future<bool> isLoggedIn() async {

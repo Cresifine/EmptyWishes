@@ -7,6 +7,8 @@ import 'screens/login_screen.dart';
 import 'screens/feed_screen.dart';
 import 'services/auth_service.dart';
 import 'services/storage_service.dart';
+import 'services/notification_service.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +73,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  int _unreadCount = 0;
+  Timer? _notificationTimer;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -79,6 +83,35 @@ class _MainScreenState extends State<MainScreen> {
     const NotificationsScreen(),
     const ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUnreadCount();
+    // Poll for unread count every 30 seconds
+    _notificationTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      _loadUnreadCount();
+    });
+  }
+
+  @override
+  void dispose() {
+    _notificationTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final count = await NotificationService.getUnreadCount();
+      if (mounted) {
+        setState(() {
+          _unreadCount = count;
+        });
+      }
+    } catch (e) {
+      print('[MainScreen] Error loading unread count: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,29 +123,46 @@ class _MainScreenState extends State<MainScreen> {
           setState(() {
             _currentIndex = index;
           });
+          // Reload unread count when navigating away from notifications
+          if (index != 3) {
+            _loadUnreadCount();
+          } else {
+            // Clear badge when entering notifications screen
+            Future.delayed(const Duration(seconds: 1), () {
+              _loadUnreadCount();
+            });
+          }
         },
-        destinations: const [
-          NavigationDestination(
+        destinations: [
+          const NavigationDestination(
             icon: Icon(Icons.grid_view_rounded),
             selectedIcon: Icon(Icons.grid_view),
             label: 'My Goals',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.explore_outlined),
             selectedIcon: Icon(Icons.explore_rounded),
             label: 'Feed',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.add_circle_outline_rounded),
             selectedIcon: Icon(Icons.add_circle_rounded),
             label: 'New Goal',
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications_rounded),
+            icon: Badge(
+              isLabelVisible: _unreadCount > 0,
+              label: Text(_unreadCount > 99 ? '99+' : '$_unreadCount'),
+              child: const Icon(Icons.notifications_outlined),
+            ),
+            selectedIcon: Badge(
+              isLabelVisible: _unreadCount > 0,
+              label: Text(_unreadCount > 99 ? '99+' : '$_unreadCount'),
+              child: const Icon(Icons.notifications_rounded),
+            ),
             label: 'Updates',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.person_outline_rounded),
             selectedIcon: Icon(Icons.person_rounded),
             label: 'Profile',

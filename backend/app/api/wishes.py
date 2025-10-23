@@ -1,11 +1,16 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Header, UploadFile, File, Form
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime
 from app.schemas.wish import WishCreate, WishUpdate, WishResponse
 from app.database import get_db
 from app.models.wish import Wish
 from app.models.attachment import Attachment
+from app.models.user import User
+from app.models.like import Like
+from app.models.comment import Comment
+from app.models.view import View
 from app.api.users import get_current_user_from_token
 import shutil
 import mimetypes
@@ -164,6 +169,90 @@ def get_wishes(
     
     return wishes
 
+@router.get("/public/feed")
+def get_public_feed(
+    filter_type: Optional[str] = None,
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
+):
+    """Get public feed of wishes with engagement stats, sorted by engagement"""
+    # Get current user if authenticated
+    current_user_id = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.replace("Bearer ", "")
+        try:
+            user = get_current_user_from_token(token, db)
+            current_user_id = user.id
+        except:
+            pass
+    
+    # Get all wishes that are not archived or missed (public posts)
+    query = db.query(Wish).filter(
+        Wish.status.in_(["current", "completed"])
+    )
+    
+    wishes = query.all()
+    
+    # Build feed items with engagement stats
+    feed_items = []
+    for wish in wishes:
+        # Get engagement stats
+        likes_count = db.query(func.count(Like.id)).filter(Like.wish_id == wish.id).scalar() or 0
+        comments_count = db.query(func.count(Comment.id)).filter(Comment.wish_id == wish.id).scalar() or 0
+        views_count = db.query(func.count(View.id)).filter(View.wish_id == wish.id).scalar() or 0
+        
+        # Check if current user liked this
+        is_liked = False
+        if current_user_id:
+            is_liked = db.query(Like).filter(
+                Like.user_id == current_user_id,
+                Like.wish_id == wish.id
+            ).first() is not None
+        
+        # Get wish owner info
+        owner = db.query(User).filter(User.id == wish.user_id).first()
+        
+        # Calculate engagement score (formula: likes * 3 + comments * 5 + views * 0.1)
+        engagement_score = (likes_count * 3) + (comments_count * 5) + (views_count * 0.1)
+        
+        feed_items.append({
+            "wish": {
+                "id": wish.id,
+                "title": wish.title,
+                "description": wish.description,
+                "progress": wish.progress,
+                "is_completed": wish.is_completed,
+                "status": wish.status,
+                "created_at": wish.created_at.isoformat(),
+                "target_date": wish.target_date.isoformat() if wish.target_date else None,
+                "cover_image": wish.cover_image,
+                "consequence": wish.consequence,
+            },
+            "user": {
+                "id": owner.id,
+                "username": owner.username,
+                "email": owner.email,
+            },
+            "engagement": {
+                "likes_count": likes_count,
+                "comments_count": comments_count,
+                "views_count": views_count,
+                "is_liked": is_liked,
+                "engagement_score": engagement_score,
+            }
+        })
+    
+    # Sort by engagement score (highest first) or by creation date
+    if filter_type == "Popular":
+        feed_items.sort(key=lambda x: x["engagement"]["engagement_score"], reverse=True)
+    elif filter_type == "Recent":
+        feed_items.sort(key=lambda x: x["wish"]["created_at"], reverse=True)
+    else:  # All or default
+        # Sort by engagement score for default view
+        feed_items.sort(key=lambda x: x["engagement"]["engagement_score"], reverse=True)
+    
+    return feed_items
+
 @router.get("/{wish_id}", response_model=WishResponse)
 def get_wish(wish_id: int, db: Session = Depends(get_db)):
     wish = db.query(Wish).filter(Wish.id == wish_id).first()
@@ -172,10 +261,26 @@ def get_wish(wish_id: int, db: Session = Depends(get_db)):
     return wish
 
 @router.patch("/{wish_id}", response_model=WishResponse)
-def update_wish(wish_id: int, wish_update: WishUpdate, db: Session = Depends(get_db)):
-    db_wish = db.query(Wish).filter(Wish.id == wish_id).first()
+def update_wish(
+    wish_id: int, 
+    wish_update: WishUpdate, 
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
+):
+    # Get current user
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    try:
+        user = get_current_user_from_token(token, db)
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    # Get wish and verify ownership
+    db_wish = db.query(Wish).filter(Wish.id == wish_id, Wish.user_id == user.id).first()
     if not db_wish:
-        raise HTTPException(status_code=404, detail="Wish not found")
+        raise HTTPException(status_code=404, detail="Wish not found or doesn't belong to you")
     
     update_data = wish_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
@@ -186,10 +291,25 @@ def update_wish(wish_id: int, wish_update: WishUpdate, db: Session = Depends(get
     return db_wish
 
 @router.delete("/{wish_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_wish(wish_id: int, db: Session = Depends(get_db)):
-    wish = db.query(Wish).filter(Wish.id == wish_id).first()
+def delete_wish(
+    wish_id: int, 
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
+):
+    # Get current user
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    try:
+        user = get_current_user_from_token(token, db)
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    # Get wish and verify ownership
+    wish = db.query(Wish).filter(Wish.id == wish_id, Wish.user_id == user.id).first()
     if not wish:
-        raise HTTPException(status_code=404, detail="Wish not found")
+        raise HTTPException(status_code=404, detail="Wish not found or doesn't belong to you")
     
     db.delete(wish)
     db.commit()

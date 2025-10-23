@@ -5,6 +5,7 @@ import 'dart:io';
 import '../models/wish.dart';
 import '../services/progress_update_service.dart';
 import '../services/wish_service.dart';
+import '../services/auth_service.dart';
 
 class GoalDetailScreen extends StatefulWidget {
   final Wish wish;
@@ -22,11 +23,31 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
   List<File> _selectedFiles = [];
   int? _progressValue;
   final ImagePicker _picker = ImagePicker();
+  late Wish _currentWish; // Track the current wish state
+  int? _currentUserId; // Track the current logged-in user's ID
+  bool _isOwner = false; // Whether the current user owns this goal
 
   @override
   void initState() {
     super.initState();
+    _currentWish = widget.wish; // Initialize with the passed wish
+    _checkOwnership();
     _loadProgressUpdates();
+  }
+
+  Future<void> _checkOwnership() async {
+    try {
+      final currentUser = await AuthService.getCurrentUser();
+      if (currentUser != null && mounted) {
+        setState(() {
+          _currentUserId = currentUser['id'];
+          _isOwner = (_currentUserId == _currentWish.userId);
+        });
+        print('[GoalDetailScreen] Current user ID: $_currentUserId, Goal owner ID: ${_currentWish.userId}, Is owner: $_isOwner');
+      }
+    } catch (e) {
+      print('[GoalDetailScreen] Error checking ownership: $e');
+    }
   }
 
   @override
@@ -36,15 +57,32 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
   }
 
   Future<void> _loadProgressUpdates() async {
+    print('[GoalDetailScreen] ===== Loading progress updates for wish ${_currentWish.id} =====');
     setState(() => _isLoading = true);
     
-    final updates = await ProgressUpdateService.getProgressUpdates(widget.wish.id);
+    final updates = await ProgressUpdateService.getProgressUpdates(_currentWish.id);
+    print('[GoalDetailScreen] Received ${updates.length} updates');
+    
+    // Sort updates: newest first (top), oldest last (bottom)
+    updates.sort((a, b) {
+      final aDate = DateTime.parse(a['created_at']);
+      final bDate = DateTime.parse(b['created_at']);
+      return bDate.compareTo(aDate); // Descending order (newest first)
+    });
+    
+    print('[GoalDetailScreen] After sorting: ${updates.length} updates');
+    if (updates.isNotEmpty) {
+      print('[GoalDetailScreen] First update: ${updates.first['content']}');
+    } else {
+      print('[GoalDetailScreen] ⚠️ No updates to display!');
+    }
     
     if (mounted) {
       setState(() {
         _progressUpdates = updates;
         _isLoading = false;
       });
+      print('[GoalDetailScreen] UI updated with ${_progressUpdates.length} updates');
     }
   }
 
@@ -147,36 +185,36 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Text(
-                          'Update Progress',
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '${_progressValue ?? widget.wish.progress}%',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                      Row(
+                        children: [
+                          const Text(
+                            'Update Progress',
+                            style: TextStyle(fontWeight: FontWeight.w500),
                           ),
-                        ),
-                      ],
-                    ),
+                          const Spacer(),
+                          Text(
+                            '${_progressValue ?? _currentWish.progress}%',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
                     Slider(
-                      value: (_progressValue ?? widget.wish.progress).toDouble(),
-                      min: widget.wish.progress.toDouble(), // Can't go below current progress
+                      value: (_progressValue ?? _currentWish.progress).toDouble(),
+                      min: _currentWish.progress.toDouble(), // Can't go below current progress
                       max: 100,
-                      divisions: (100 - widget.wish.progress) ~/ 5, // Dynamic divisions based on remaining progress
-                      label: '${_progressValue ?? widget.wish.progress}%',
+                      divisions: (100 - _currentWish.progress) ~/ 5, // Dynamic divisions based on remaining progress
+                      label: '${_progressValue ?? _currentWish.progress}%',
                       onChanged: (value) {
                         final newValue = value.toInt();
-                        if (newValue < widget.wish.progress) {
+                        if (newValue < _currentWish.progress) {
                           // Show warning if trying to decrease
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Cannot decrease progress below ${widget.wish.progress}%'),
+                              content: Text('Cannot decrease progress below ${_currentWish.progress}%'),
                               backgroundColor: Colors.orange,
                               duration: const Duration(seconds: 2),
                             ),
@@ -265,10 +303,10 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
 
   Future<void> _addProgressUpdate() async {
     // Validate progress isn't decreasing
-    if (_progressValue != null && _progressValue! < widget.wish.progress) {
+    if (_progressValue != null && _progressValue! < _currentWish.progress) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Cannot decrease progress below ${widget.wish.progress}%'),
+          content: Text('Cannot decrease progress below ${_currentWish.progress}%'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -277,10 +315,13 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     
     // Allow empty content if progress changed or files added
     final hasContent = _updateController.text.trim().isNotEmpty;
-    final hasProgressChange = _progressValue != null && _progressValue != widget.wish.progress;
+    final hasProgressChange = _progressValue != null && _progressValue != _currentWish.progress;
     final hasFiles = _selectedFiles.isNotEmpty;
     
+    final contentToSend = _updateController.text.trim();
     print('[GoalDetailScreen] hasContent: $hasContent, hasProgressChange: $hasProgressChange, hasFiles: $hasFiles, filesCount: ${_selectedFiles.length}');
+    print('[GoalDetailScreen] Content to send: "$contentToSend"');
+    print('[GoalDetailScreen] Progress value: $_progressValue');
     
     if (!hasContent && !hasProgressChange && !hasFiles) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -299,8 +340,8 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     );
 
     final success = await ProgressUpdateService.createProgressUpdate(
-      wishId: widget.wish.id,
-      content: _updateController.text.trim(),
+      wishId: _currentWish.id,
+      content: contentToSend,
       progressValue: _progressValue,
       files: _selectedFiles.isNotEmpty ? _selectedFiles : null,
     );
@@ -316,11 +357,31 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     });
 
     if (success) {
+      // Update the local wish progress if a new value was set
+      if (savedProgressValue != null && mounted) {
+        setState(() {
+          _currentWish = Wish(
+            id: _currentWish.id,
+            userId: _currentWish.userId,
+            title: _currentWish.title,
+            description: _currentWish.description,
+            progress: savedProgressValue,
+            isCompleted: savedProgressValue >= 100,
+            status: savedProgressValue >= 100 ? 'completed' : _currentWish.status,
+            createdAt: _currentWish.createdAt,
+            targetDate: _currentWish.targetDate,
+            consequence: _currentWish.consequence,
+            coverImage: _currentWish.coverImage,
+          );
+        });
+        print('[GoalDetailScreen] Updated local wish progress to $savedProgressValue%');
+      }
+      
       // Refresh the progress updates immediately
       await _loadProgressUpdates();
       
       // Pop back to refresh the goals list if completed
-      final finalProgress = savedProgressValue ?? widget.wish.progress;
+      final finalProgress = savedProgressValue ?? _currentWish.progress;
       if (finalProgress >= 100 && mounted) {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) Navigator.pop(context, true);
@@ -367,16 +428,16 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
               );
               
               // Call API to mark as failed
-              final success = await WishService.markAsFailed(widget.wish.id);
+              final success = await WishService.markAsFailed(_currentWish.id);
               
               if (mounted) Navigator.pop(context); // Close loading dialog
               
               if (success && mounted) {
                 // Add a progress update for history
                 await ProgressUpdateService.createProgressUpdate(
-                  wishId: widget.wish.id,
+                  wishId: _currentWish.id,
                   content: 'Goal marked as failed 😔',
-                  progressValue: widget.wish.progress,
+                  progressValue: _currentWish.progress,
                   files: null,
                 );
                 
@@ -414,7 +475,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
       appBar: AppBar(
         title: const Text('Goal Details'),
         actions: [
-          if (widget.wish.status == 'current')
+          if (_currentWish.status == 'current')
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'fail') {
@@ -453,16 +514,16 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.wish.title,
+                  _currentWish.title,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (widget.wish.description.isNotEmpty) ...[
+                if (_currentWish.description.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
-                    widget.wish.description,
+                    _currentWish.description,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[700],
@@ -484,30 +545,30 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: LinearProgressIndicator(
-                                  value: widget.wish.progress / 100,
-                                  backgroundColor: Colors.grey[300],
-                                  minHeight: 8,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: LinearProgressIndicator(
+                                    value: _currentWish.progress / 100,
+                                    backgroundColor: Colors.grey[300],
+                                    minHeight: 8,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${widget.wish.progress}%',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${_currentWish.progress}%',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                if (widget.wish.consequence != null && widget.wish.consequence!.isNotEmpty) ...[
+                if (_currentWish.consequence != null && _currentWish.consequence!.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -534,7 +595,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                widget.wish.consequence!,
+                                _currentWish.consequence!,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.orange[800],
@@ -603,31 +664,32 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                       ),
           ),
 
-          // Add Update Button
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: _showAddUpdateDialog,
-              icon: const Icon(Icons.add_circle_outline_rounded),
-              label: const Text('Add Progress Update', style: TextStyle(fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          // Add Update Button (only for goal owner)
+          if (_isOwner)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: _showAddUpdateDialog,
+                icon: const Icon(Icons.add_circle_outline_rounded),
+                label: const Text('Add Progress Update', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -850,7 +912,8 @@ class _ProgressUpdateCard extends StatelessWidget {
                                 final String filePath = attachment['file_path'];
                                 final String fileType = attachment['file_type'] ?? 'application/octet-stream';
                                 final int fileSize = attachment['file_size'] ?? 0;
-                                final String fullUrl = 'http://10.0.2.2:8000$filePath';
+                                final bool isLocal = attachment['is_local'] == true;
+                                final String fullUrl = isLocal ? filePath : 'http://10.0.2.2:8000$filePath';
                                 
                                 IconData icon;
                                 Color iconColor;
@@ -891,6 +954,7 @@ class _ProgressUpdateCard extends StatelessWidget {
                                             builder: (context) => _FullScreenImage(
                                               imageUrl: fullUrl,
                                               fileName: fileName,
+                                              isLocal: isLocal,
                                             ),
                                           ),
                                         );
@@ -1015,10 +1079,12 @@ class _ProgressUpdateCard extends StatelessWidget {
 class _FullScreenImage extends StatelessWidget {
   final String imageUrl;
   final String fileName;
+  final bool isLocal;
 
   const _FullScreenImage({
     required this.imageUrl,
     required this.fileName,
+    this.isLocal = false,
   });
 
   @override
@@ -1039,41 +1105,65 @@ class _FullScreenImage extends StatelessWidget {
         child: InteractiveViewer(
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.contain,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded / 
-                        loadingProgress.expectedTotalBytes!
-                      : null,
-                  color: Colors.white,
+          child: isLocal
+              ? Image.file(
+                  File(imageUrl),
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.white,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Failed to load local image',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                )
+              : Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / 
+                              loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.white,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Failed to load image',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.broken_image_rounded,
-                      color: Colors.white,
-                      size: 64,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Failed to load image',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
         ),
       ),
     );
