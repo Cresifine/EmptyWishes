@@ -74,6 +74,12 @@ class SyncService {
       if (wish['consequence'] != null && wish['consequence'].toString().isNotEmpty) {
         request.fields['consequence'] = wish['consequence'];
       }
+      
+      // Add tags if present
+      if (wish['tags'] != null && wish['tags'] is List && (wish['tags'] as List).isNotEmpty) {
+        request.fields['tags'] = json.encode(wish['tags']);
+        print('[SyncService] Adding tags: ${wish['tags']}');
+      }
 
       // Add local cover image if exists
       if (wish['local_cover_image'] != null) {

@@ -158,6 +158,9 @@ class NotificationService {
           }
         }
         return 'People commented on your goal';
+      case 'follow':
+        final content = notification['content'];
+        return content ?? '$actorUsername started following you';
       default:
         return 'You have a new notification';
     }

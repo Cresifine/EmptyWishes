@@ -1,22 +1,25 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Header, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from typing import List, Optional
 from datetime import datetime
 from app.schemas.wish import WishCreate, WishUpdate, WishResponse
 from app.database import get_db
 from app.models.wish import Wish
 from app.models.attachment import Attachment
+from app.models.tag import Tag
 from app.models.user import User
 from app.models.like import Like
 from app.models.comment import Comment
 from app.models.view import View
 from app.api.users import get_current_user_from_token
+from app.api.tags import get_or_create_tag
 import shutil
 import mimetypes
 from pathlib import Path
 import uuid
 import os
+import json
 
 router = APIRouter()
 
@@ -38,6 +41,8 @@ async def create_wish(
     description: Optional[str] = Form(None),
     target_date: Optional[str] = Form(None),
     consequence: Optional[str] = Form(None),
+    visibility: str = Form("public"),  # public, followers, friends, private
+    tags: Optional[str] = Form(None),  # JSON array of tag names
     cover_image: Optional[UploadFile] = File(None),
     files: List[UploadFile] = File([]),
     authorization: Optional[str] = Header(None),
@@ -76,11 +81,24 @@ async def create_wish(
         target_date=parsed_target_date,
         consequence=consequence,
         cover_image=cover_image_url,
+        visibility=visibility,
         user_id=user_id,
         status="current"
     )
     db.add(db_wish)
-    db.flush()  # Get the ID for attachments
+    db.flush()  # Get the ID for attachments and tags
+    
+    # Handle tags
+    if tags:
+        try:
+            tag_names = json.loads(tags)
+            for tag_name in tag_names:
+                tag = get_or_create_tag(db, tag_name)
+                if tag:
+                    db_wish.tags.append(tag)
+                    tag.usage_count += 1
+        except json.JSONDecodeError:
+            print(f"[create_wish] Failed to parse tags JSON: {tags}")
     
     # Handle file attachments
     for file in files:
@@ -111,7 +129,7 @@ async def create_wish(
     db.commit()
     db.refresh(db_wish)
     
-    # Return with attachments
+    # Return with attachments and tags
     return {
         "id": db_wish.id,
         "title": db_wish.title,
@@ -124,6 +142,7 @@ async def create_wish(
         "consequence": db_wish.consequence,
         "cover_image": db_wish.cover_image,
         "user_id": db_wish.user_id,
+        "tags": [{"id": tag.id, "name": tag.name} for tag in db_wish.tags],
         "attachments": [
             {
                 "id": att.id,
@@ -172,6 +191,7 @@ def get_wishes(
 @router.get("/public/feed")
 def get_public_feed(
     filter_type: Optional[str] = None,
+    tag: Optional[str] = None,  # Filter by tag name
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -186,10 +206,64 @@ def get_public_feed(
         except:
             pass
     
-    # Get all wishes that are not archived or missed (public posts)
+    # Get wishes based on visibility and user relationship
+    from app.models.follow import Follow
+    
+    # Start with wishes that are not archived or missed
     query = db.query(Wish).filter(
         Wish.status.in_(["current", "completed"])
     )
+    
+    if current_user_id:
+        # Get following relationships
+        following_ids = db.query(Follow.following_id).filter(
+            Follow.follower_id == current_user_id
+        ).all()
+        following_ids = [fid[0] for fid in following_ids]
+        
+        # Get followers (for friends check)
+        followers_ids = db.query(Follow.follower_id).filter(
+            Follow.following_id == current_user_id
+        ).all()
+        followers_ids = [fid[0] for fid in followers_ids]
+        
+        # Friends are mutual follows
+        friends_ids = list(set(following_ids) & set(followers_ids))
+        
+        # Build visibility filter
+        # Show: public posts, own posts, posts from followed users if visibility allows
+        visibility_conditions = [
+            Wish.visibility == "public",  # Public posts
+            Wish.user_id == current_user_id,  # Own posts
+        ]
+        
+        # Posts visible to followers (if user is following the poster)
+        if following_ids:
+            visibility_conditions.append(
+                (Wish.visibility == "followers") & (Wish.user_id.in_(following_ids))
+            )
+        
+        # Posts visible to friends only (if mutual follow)
+        if friends_ids:
+            visibility_conditions.append(
+                (Wish.visibility == "friends") & (Wish.user_id.in_(friends_ids))
+            )
+        
+        query = query.filter(or_(*visibility_conditions))
+        
+        # Filter by following if specified
+        if filter_type == "Following":
+            if following_ids:
+                query = query.filter(Wish.user_id.in_(following_ids))
+            else:
+                return []
+    else:
+        # Not logged in - only show public posts
+        query = query.filter(Wish.visibility == "public")
+    
+    # Filter by tag if specified
+    if tag:
+        query = query.join(Wish.tags).filter(Tag.name == tag.lower())
     
     wishes = query.all()
     
@@ -227,6 +301,17 @@ def get_public_feed(
                 "target_date": wish.target_date.isoformat() if wish.target_date else None,
                 "cover_image": wish.cover_image,
                 "consequence": wish.consequence,
+                "tags": [{"id": tag.id, "name": tag.name} for tag in wish.tags],
+                "attachments": [
+                    {
+                        "id": att.id,
+                        "file_name": att.file_name,
+                        "file_path": att.file_path,
+                        "file_type": att.file_type,
+                        "file_size": att.file_size
+                    }
+                    for att in wish.attachments
+                ],
             },
             "user": {
                 "id": owner.id,

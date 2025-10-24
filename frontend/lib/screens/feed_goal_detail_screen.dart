@@ -3,6 +3,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../services/feed_service.dart';
 import '../services/progress_update_service.dart';
 import '../services/sync_service.dart';
+import 'feed_screen.dart';
+import 'user_profile_screen.dart';
 
 class FeedGoalDetailScreen extends StatefulWidget {
   final Map<String, dynamic> feedItem;
@@ -273,43 +275,52 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
   Widget _buildUserHeader(Map<String, dynamic> user, Map<String, dynamic> wish) {
     final createdAt = DateTime.parse(wish['created_at']);
     
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            child: Text(
-              _getInitials(user['username']),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => UserProfileScreen(userId: user['id']),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Text(
+                _getInitials(user['username']),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user['username'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user['username'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                Text(
-                  timeago.format(createdAt),
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
+                  Text(
+                    timeago.format(createdAt),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -336,6 +347,78 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
                 color: Colors.grey[700],
                 height: 1.4,
               ),
+            ),
+          ],
+          // Consequence
+          if (wish['consequence'] != null && wish['consequence'].toString().isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.orange[700], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Consequence',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange[900],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          wish['consequence'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          // Tags
+          if (wish['tags'] != null && (wish['tags'] as List).isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: (wish['tags'] as List).map((tag) {
+                final tagName = tag is Map ? tag['name'] : tag.toString();
+                return InkWell(
+                  onTap: () {
+                    // Navigate to feed screen with tag filter
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => FeedScreen(initialTag: tagName),
+                      ),
+                    );
+                  },
+                  child: Chip(
+                    label: Text(
+                      '#$tagName',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                );
+              }).toList(),
             ),
           ],
           const SizedBox(height: 16),

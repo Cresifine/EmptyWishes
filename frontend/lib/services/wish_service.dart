@@ -44,6 +44,7 @@ class WishService {
     DateTime? targetDate,
     String? consequence,
     File? coverImage,
+    List<String>? tags,
   }) async {
     try {
       print('[WishService] Creating wish locally: $title');
@@ -68,6 +69,7 @@ class WishService {
         'created_at': DateTime.now().toIso8601String(),
         'id': wishId, // Temporary local ID
         'local_cover_image': localCoverImagePath, // Store local path
+        'tags': tags ?? [],
         'synced': false,
       };
 

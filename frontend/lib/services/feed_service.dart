@@ -6,9 +6,9 @@ class FeedService {
   static const String baseUrl = 'http://10.0.2.2:8000';
 
   /// Fetch public feed from the backend
-  static Future<List<Map<String, dynamic>>> getFeed({String? filter}) async {
+  static Future<List<Map<String, dynamic>>> getFeed({String? filter, String? tag}) async {
     try {
-      print('[FeedService] Fetching feed with filter: $filter');
+      print('[FeedService] Fetching feed with filter: $filter, tag: $tag');
       
       final token = await StorageService.getToken();
       final headers = <String, String>{
@@ -19,9 +19,23 @@ class FeedService {
         headers['Authorization'] = 'Bearer $token';
       }
       
-      final uri = filter != null
-          ? Uri.parse('$baseUrl/api/wishes/public/feed?filter_type=$filter')
-          : Uri.parse('$baseUrl/api/wishes/public/feed');
+      // Build URL with optional filter and tag
+      String url = '$baseUrl/api/wishes/public/feed';
+      List<String> params = [];
+      
+      if (filter != null && filter.isNotEmpty) {
+        params.add('filter_type=$filter');
+      }
+      
+      if (tag != null && tag.isNotEmpty) {
+        params.add('tag=${Uri.encodeComponent(tag)}');
+      }
+      
+      if (params.isNotEmpty) {
+        url += '?${params.join('&')}';
+      }
+      
+      final uri = Uri.parse(url);
       
       final response = await http.get(
         uri,

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 import '../services/sync_service.dart';
+import '../services/follow_service.dart';
 import 'login_screen.dart';
 import '../widgets/user_search_field.dart';
+import 'settings_screen.dart';
+import 'followers_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,6 +21,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isOfflineMode = false;
   int _pendingWishesCount = 0;
+  int _followersCount = 0;
+  int _followingCount = 0;
 
   @override
   void initState() {
@@ -28,7 +33,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserData() async {
     print('[ProfileScreen] Loading user data...');
     final isOffline = await StorageService.isOfflineMode();
-    print('[ProfileScreen] Offline mode: $isOffline');
+    final hasToken = await StorageService.getToken() != null;
+    print('[ProfileScreen] Offline mode: $isOffline, Has token: $hasToken');
     
     // Try to get fresh user data from API
     final userData = await AuthService.getCurrentUser();
@@ -44,16 +50,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     
     final pendingWishes = await StorageService.getPendingWishes();
     
+    // Get followers/following counts if logged in
+    int followersCount = 0;
+    int followingCount = 0;
+    if (!isOffline && hasToken && finalUserData != null) {
+      try {
+        final followStatus = await FollowService.getFollowStatus(finalUserData['id']);
+        followersCount = followStatus?['followers_count'] ?? 0;
+        followingCount = followStatus?['following_count'] ?? 0;
+      } catch (e) {
+        print('[ProfileScreen] Error getting follow counts: $e');
+      }
+    }
+    
     if (mounted) {
       setState(() {
-        _isOfflineMode = isOffline;
+        // Only set offline mode if truly offline (no token and explicitly offline)
+        _isOfflineMode = isOffline && !hasToken;
         _userData = finalUserData;
         _userStats = finalUserData?['statistics'] ?? {};
         _pendingWishesCount = pendingWishes?.length ?? 0;
+        _followersCount = followersCount;
+        _followingCount = followingCount;
         _isLoading = false;
       });
       
-      print('[ProfileScreen] Final user data set: $_userData');
+      print('[ProfileScreen] Final user data set: $_userData, Offline: $_isOfflineMode');
     }
   }
 
@@ -100,6 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             expandedHeight: 120,
             floating: false,
             pinned: true,
+            actions: [],
             flexibleSpace: FlexibleSpaceBar(
               title: const Text('Profile'),
               background: Container(
@@ -264,6 +287,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Row(
                                 children: [
                                   Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (_userData != null) {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => FollowersListScreen(
+                                                userId: _userData!['id'],
+                                                title: 'Followers',
+                                                isFollowers: true,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: _StatCard(
+                                        icon: Icons.people_rounded,
+                                        value: '$_followersCount',
+                                        label: 'Followers',
+                                        color: Colors.purple,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (_userData != null) {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => FollowersListScreen(
+                                                userId: _userData!['id'],
+                                                title: 'Following',
+                                                isFollowers: false,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: _StatCard(
+                                        icon: Icons.person_add_rounded,
+                                        value: '$_followingCount',
+                                        label: 'Following',
+                                        color: Colors.teal,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
                                     child: _StatCard(
                                       icon: Icons.check_circle_rounded,
                                       value: _userStats['completed_wishes']?.toString() ?? '0',
@@ -346,11 +421,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
+                  if (!_isOfflineMode)
+                    ListTile(
+                      leading: const Icon(Icons.people_rounded),
+                      title: const Text('Followers & Following'),
+                      subtitle: Text('$_followersCount followers • $_followingCount following'),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                      onTap: () {
+                        if (_userData != null) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => FollowersListScreen(
+                                userId: _userData!['id'],
+                                title: 'Followers',
+                                isFollowers: true,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  if (!_isOfflineMode)
+                    const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.settings),
                     title: const Text('Settings'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {},
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsScreen(),
+                        ),
+                      );
+                      // Reload user data after settings
+                      _loadUserData();
+                    },
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -370,29 +475,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
-            // Settings Section
-            if (!_isOfflineMode) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _SettingsCard(onSyncComplete: _loadUserData),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
             
             Padding(
               padding: const EdgeInsets.all(16),

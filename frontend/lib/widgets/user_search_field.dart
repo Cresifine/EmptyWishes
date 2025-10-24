@@ -168,7 +168,6 @@ class _UserSearchFieldState extends State<UserSearchField> {
                               MaterialPageRoute(
                                 builder: (context) => UserProfileScreen(
                                   userId: userId,
-                                  username: username,
                                 ),
                               ),
                             );

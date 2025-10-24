@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api import auth, wishes, users, engagements, progress_updates, notifications
+from app.api import auth, wishes, users, engagements, progress_updates, notifications, tags, follows
 import logging
 import time
 from pathlib import Path
@@ -49,6 +49,8 @@ app.include_router(wishes.router, prefix="/api/wishes", tags=["wishes"])
 app.include_router(engagements.router, prefix="/api/engagements", tags=["engagements"])
 app.include_router(progress_updates.router, prefix="/api", tags=["progress_updates"])
 app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(tags.router, prefix="/api/tags", tags=["tags"])
+app.include_router(follows.router, prefix="/api/users", tags=["follows"])
 
 # Mount uploads directory for serving uploaded images
 UPLOAD_DIR = Path("uploads")

@@ -9,12 +9,19 @@ class WishStatus(str, Enum):
     ARCHIVED = "archived"
     MISSED = "missed"
 
+class WishVisibility(str, Enum):
+    PUBLIC = "public"
+    FOLLOWERS = "followers"
+    FRIENDS = "friends"
+    PRIVATE = "private"
+
 class WishCreate(BaseModel):
     title: str
     description: Optional[str] = None
     target_date: Optional[datetime] = None
     consequence: Optional[str] = None
     cover_image: Optional[str] = None
+    visibility: Optional[WishVisibility] = WishVisibility.PUBLIC
 
 class WishUpdate(BaseModel):
     title: Optional[str] = None
@@ -22,6 +29,7 @@ class WishUpdate(BaseModel):
     progress: Optional[int] = None
     is_completed: Optional[bool] = None
     status: Optional[WishStatus] = None
+    visibility: Optional[WishVisibility] = None
     consequence: Optional[str] = None
     cover_image: Optional[str] = None
 

@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
+import '../services/follow_service.dart';
+import '../services/auth_service.dart';
 import '../models/wish.dart';
-import '../widgets/wish_card.dart';
+import 'goal_detail_screen.dart';
+import 'followers_list_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final int userId;
-  final String username;
-
-  const UserProfileScreen({
-    super.key,
-    required this.userId,
-    required this.username,
-  });
+  
+  const UserProfileScreen({super.key, required this.userId});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  Map<String, dynamic>? _userData;
   bool _isLoading = true;
+  Map<String, dynamic>? _userData;
+  Map<String, dynamic>? _userStats;
+  List<Wish> _userGoals = [];
+  bool _isFollowing = false;
+  int _followersCount = 0;
+  int _followingCount = 0;
+  bool _isCurrentUser = false;
 
   @override
   void initState() {
@@ -30,304 +34,308 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> _loadUserProfile() async {
     setState(() => _isLoading = true);
     
-    final profile = await UserService.getUserProfile(widget.userId);
-    
-    if (mounted) {
-      setState(() {
-        _userData = profile;
-        _isLoading = false;
-      });
+    try {
+      // Check if this is the current user
+      final currentUser = await AuthService.getCurrentUser();
+      final isCurrentUser = currentUser != null && currentUser['id'] == widget.userId;
+      
+      final userData = await UserService.getUserById(widget.userId);
+      final userStats = await UserService.getUserStats(widget.userId);
+      final userGoals = await UserService.getUserWishes(widget.userId);
+      
+      // Get follow status if not current user
+      Map<String, dynamic>? followStatus;
+      if (!isCurrentUser) {
+        followStatus = await FollowService.getFollowStatus(widget.userId);
+      }
+      
+      if (mounted) {
+        setState(() {
+          _userData = userData;
+          _userStats = userStats;
+          _userGoals = userGoals;
+          _isCurrentUser = isCurrentUser;
+          _isFollowing = followStatus?['is_following'] ?? false;
+          _followersCount = followStatus?['followers_count'] ?? 0;
+          _followingCount = followStatus?['following_count'] ?? 0;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[UserProfileScreen] Error loading user profile: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to load user profile'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
+  }
+
+  Future<void> _toggleFollow() async {
+    bool success;
+    if (_isFollowing) {
+      success = await FollowService.unfollowUser(widget.userId);
+    } else {
+      success = await FollowService.followUser(widget.userId);
+    }
+
+    if (success && mounted) {
+      setState(() {
+        _isFollowing = !_isFollowing;
+        _followersCount += _isFollowing ? 1 : -1;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_isFollowing ? 'Following user!' : 'Unfollowed user'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update follow status'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  String _getInitials(String username) {
+    final parts = username.split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return username.substring(0, username.length > 1 ? 2 : 1).toUpperCase();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.username),
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (_userData == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.username),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 64,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Failed to load profile',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _loadUserProfile,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final stats = _userData!['statistics'];
-    final wishes = (_userData!['wishes'] as List<dynamic>?)
-        ?.map((w) => Wish.fromJson(w))
-        .toList() ?? [];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(_userData!['username']),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _loadUserProfile,
-          ),
-        ],
+        title: const Text('User Profile'),
+        elevation: 0,
       ),
-      body: RefreshIndicator(
-        onRefresh: _loadUserProfile,
-        child: CustomScrollView(
-          slivers: [
-            // User Header
-            SliverToBoxAdapter(
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                ),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: Text(
-                        _userData!['username'][0].toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _userData == null
+              ? const Center(child: Text('User not found'))
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Profile header
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              child: Text(
+                                _getInitials(_userData!['username']),
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              _userData!['username'],
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _userData!['email'],
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                            // Follow button
+                            if (!_isCurrentUser) ...[
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: _toggleFollow,
+                                icon: Icon(_isFollowing ? Icons.person_remove_rounded : Icons.person_add_rounded),
+                                label: Text(_isFollowing ? 'Unfollow' : 'Follow'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: _isFollowing ? Colors.grey[400] : null,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _userData!['username'],
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _userData!['email'],
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Statistics Card
-            SliverToBoxAdapter(
-              child: Card(
-                margin: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.bar_chart_rounded, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Statistics',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                      
+                      // User stats
+                      if (_userStats != null || !_isCurrentUser)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _StatColumn(
+                                label: 'Goals',
+                                value: '${_userStats?['total_wishes'] ?? 0}',
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => FollowersListScreen(
+                                        userId: widget.userId,
+                                        title: 'Followers',
+                                        isFollowers: true,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: _StatColumn(
+                                  label: 'Followers',
+                                  value: '$_followersCount',
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => FollowersListScreen(
+                                        userId: widget.userId,
+                                        title: 'Following',
+                                        isFollowers: false,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: _StatColumn(
+                                  label: 'Following',
+                                  value: '$_followingCount',
+                                ),
+                              ),
+                              _StatColumn(
+                                label: 'Avg Progress',
+                                value: '${_userStats?['average_progress']?.toStringAsFixed(0) ?? 0}%',
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.flag_rounded,
-                              value: stats['total_wishes']?.toString() ?? '0',
-                              label: 'Goals',
-                              color: Colors.blue,
+                        ),
+                      
+                      const Divider(),
+                      
+                      // User goals
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Public Goals',
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.trending_up_rounded,
-                              value: '${stats['average_progress']?.toStringAsFixed(0) ?? '0'}%',
-                              label: 'Avg Progress',
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.check_circle_rounded,
-                              value: stats['completed_wishes']?.toString() ?? '0',
-                              label: 'Completed',
-                              color: Colors.orange,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.local_fire_department_rounded,
-                              value: stats['current_streak']?.toString() ?? '0',
-                              label: 'Day Streak',
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            if (_userGoals.isEmpty)
+                              const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(32.0),
+                                  child: Text('No public goals yet'),
+                                ),
+                              )
+                            else
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _userGoals.length,
+                                itemBuilder: (context, index) {
+                                  final goal = _userGoals[index];
+                                  return Card(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.all(16),
+                                      title: Text(
+                                        goal.title,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            goal.description,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          LinearProgressIndicator(
+                                            value: goal.progress / 100,
+                                            minHeight: 6,
+                                            backgroundColor: Colors.grey[200],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${goal.progress}% complete',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => GoalDetailScreen(wish: goal),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
-            
-            // Current Goals Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    const Icon(Icons.play_circle_outline_rounded, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Current Goals',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${wishes.length}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Goals List
-            wishes.isEmpty
-                ? SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.star_border,
-                            size: 100,
-                            color: Colors.grey[300],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No current goals',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : SliverPadding(
-                    padding: const EdgeInsets.all(16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: WishCard(wish: wishes[index]),
-                        ),
-                        childCount: wishes.length,
-                      ),
-                    ),
-                  ),
-          ],
-        ),
-      ),
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
+class _StatColumn extends StatelessWidget {
   final String label;
-  final Color color;
+  final String value;
 
-  const _StatCard({
-    required this.icon,
-    required this.value,
+  const _StatColumn({
     required this.label,
-    required this.color,
+    required this.value,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+    return Column(
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[700],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
-

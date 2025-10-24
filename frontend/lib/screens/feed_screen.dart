@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import '../services/feed_service.dart';
 import '../services/sync_service.dart';
 import '../services/storage_service.dart';
+import '../services/tag_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'feed_goal_detail_screen.dart';
+import 'user_profile_screen.dart';
 
 class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+  final String? initialTag;
+  
+  const FeedScreen({super.key, this.initialTag});
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
@@ -16,13 +20,26 @@ class _FeedScreenState extends State<FeedScreen> {
   bool _isOnline = false;
   bool _isLoading = true;
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Popular', 'Recent'];
+  final List<String> _filters = ['All', 'Following', 'Popular', 'Recent'];
   List<Map<String, dynamic>> _feedItems = [];
+  final TextEditingController _searchController = TextEditingController();
+  String? _selectedTag;
+  List<Map<String, dynamic>> _tagSuggestions = [];
+  bool _showSearchBar = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.initialTag != null) {
+      _selectedTag = widget.initialTag;
+    }
     _loadFeed();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadFeed() async {
@@ -31,6 +48,7 @@ class _FeedScreenState extends State<FeedScreen> {
     final isOnline = await SyncService.isOnline();
     final feedItems = await FeedService.getFeed(
       filter: _selectedFilter == 'All' ? null : _selectedFilter,
+      tag: _selectedTag,
     );
     
     if (mounted) {
@@ -42,11 +60,59 @@ class _FeedScreenState extends State<FeedScreen> {
     }
   }
 
+  Future<void> _searchTags(String query) async {
+    if (query.length < 2) {
+      setState(() => _tagSuggestions = []);
+      return;
+    }
+    
+    final tags = await TagService.searchTags(query);
+    if (mounted) {
+      setState(() => _tagSuggestions = tags);
+    }
+  }
+
+  void _filterByTag(String tagName) {
+    setState(() {
+      _selectedTag = tagName.toLowerCase();
+      _searchController.clear();
+      _tagSuggestions = [];
+      _showSearchBar = false;
+    });
+    _loadFeed();
+  }
+
+  void _clearTagFilter() {
+    setState(() {
+      _selectedTag = null;
+      _searchController.clear();
+      _tagSuggestions = [];
+    });
+    _loadFeed();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Community Feed'),
+        title: _showSearchBar
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search tags...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.white70),
+                ),
+                style: const TextStyle(color: Colors.white),
+                onChanged: _searchTags,
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    _filterByTag(value);
+                  }
+                },
+              )
+            : const Text('Community Feed'),
         elevation: 0,
         actions: [
           if (!_isOnline)
@@ -79,6 +145,18 @@ class _FeedScreenState extends State<FeedScreen> {
               ),
             ),
           IconButton(
+            icon: Icon(_showSearchBar ? Icons.close : Icons.search_rounded),
+            onPressed: () {
+              setState(() {
+                _showSearchBar = !_showSearchBar;
+                if (!_showSearchBar) {
+                  _searchController.clear();
+                  _tagSuggestions = [];
+                }
+              });
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: _loadFeed,
           ),
@@ -86,6 +164,47 @@ class _FeedScreenState extends State<FeedScreen> {
       ),
       body: Column(
         children: [
+          // Tag suggestions
+          if (_tagSuggestions.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(8),
+              color: Colors.grey[100],
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _tagSuggestions.map((tag) {
+                  return InkWell(
+                    onTap: () => _filterByTag(tag['name']),
+                    child: Chip(
+                      label: Text('#${tag['name']} (${tag['usage_count']})'),
+                      avatar: const Icon(Icons.tag, size: 16),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          // Selected tag filter
+          if (_selectedTag != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: Row(
+                children: [
+                  const Icon(Icons.filter_alt_rounded, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Filtered by: #$_selectedTag',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: _clearTagFilter,
+                    tooltip: 'Clear filter',
+                  ),
+                ],
+              ),
+            ),
           // Filter chips
           Container(
             height: 60,
@@ -131,6 +250,14 @@ class _FeedScreenState extends State<FeedScreen> {
                                 feedItem: _feedItems[index],
                                 isOnline: _isOnline,
                                 onRefresh: _loadFeed,
+                                onTagTap: _filterByTag,
+                                onUserTap: (userId) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => UserProfileScreen(userId: userId),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           ),
@@ -210,11 +337,15 @@ class _FeedWishCard extends StatefulWidget {
   final Map<String, dynamic> feedItem;
   final bool isOnline;
   final VoidCallback onRefresh;
+  final Function(String) onTagTap;
+  final Function(int) onUserTap;
 
   const _FeedWishCard({
     required this.feedItem,
     required this.isOnline,
     required this.onRefresh,
+    required this.onTagTap,
+    required this.onUserTap,
   });
 
   @override
@@ -403,11 +534,44 @@ class _FeedWishCardState extends State<_FeedWishCard> {
                 // TODO: Show options menu
               },
             ),
+            onTap: () => widget.onUserTap(user['id']),
           ),
+          
+          // Cover image
+          if (wish['cover_image'] != null && wish['cover_image'].toString().isNotEmpty)
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+              ),
+              child: Image.network(
+                'http://10.0.2.2:8000${wish['cover_image']}',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
           
           // Goal content
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -425,6 +589,30 @@ class _FeedWishCardState extends State<_FeedWishCard> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
+                // Tags
+                if (wish['tags'] != null && (wish['tags'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: (wish['tags'] as List).map((tag) {
+                      final tagName = tag is Map ? tag['name'] : tag.toString();
+                      return InkWell(
+                        onTap: () => widget.onTagTap(tagName),
+                        child: Chip(
+                          label: Text(
+                            '#$tagName',
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 
                 // Progress bar

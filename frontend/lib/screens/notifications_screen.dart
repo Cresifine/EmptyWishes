@@ -121,6 +121,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'comment':
       case 'comment_aggregated':
         return Icons.comment_rounded;
+      case 'follow':
+        return Icons.person_add_rounded;
       default:
         return Icons.notifications_rounded;
     }
@@ -134,6 +136,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'comment':
       case 'comment_aggregated':
         return Colors.blue;
+      case 'follow':
+        return Colors.green;
       default:
         return Colors.grey;
     }

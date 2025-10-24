@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../services/wish_service.dart';
+import '../services/tag_service.dart';
 
 class CreateWishScreen extends StatefulWidget {
   const CreateWishScreen({super.key});
@@ -15,16 +16,67 @@ class _CreateWishScreenState extends State<CreateWishScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _consequenceController = TextEditingController();
+  final _tagController = TextEditingController();
   DateTime? _targetDate;
   File? _coverImage;
   final ImagePicker _picker = ImagePicker();
+  final List<String> _selectedTags = [];
+  List<Map<String, dynamic>> _suggestedTags = [];
+  List<Map<String, dynamic>> _popularTags = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPopularTags();
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _consequenceController.dispose();
+    _tagController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadPopularTags() async {
+    final tags = await TagService.getPopularTags(limit: 10);
+    if (mounted) {
+      setState(() {
+        _popularTags = tags;
+      });
+    }
+  }
+
+  Future<void> _searchTags(String query) async {
+    if (query.length < 2) {
+      setState(() => _suggestedTags = []);
+      return;
+    }
+    
+    final tags = await TagService.searchTags(query);
+    if (mounted) {
+      setState(() {
+        _suggestedTags = tags;
+      });
+    }
+  }
+
+  void _addTag(String tagName) {
+    final normalized = tagName.trim().toLowerCase();
+    if (normalized.isNotEmpty && !_selectedTags.contains(normalized)) {
+      setState(() {
+        _selectedTags.add(normalized);
+        _tagController.clear();
+        _suggestedTags = [];
+      });
+    }
+  }
+
+  void _removeTag(String tag) {
+    setState(() {
+      _selectedTags.remove(tag);
+    });
   }
 
   Future<void> _pickCoverImage() async {
@@ -75,6 +127,7 @@ class _CreateWishScreenState extends State<CreateWishScreen> {
         targetDate: _targetDate,
         consequence: _consequenceController.text.isEmpty ? null : _consequenceController.text,
         coverImage: _coverImage,
+        tags: _selectedTags,
       );
 
       if (mounted) Navigator.pop(context); // Close loading
@@ -90,9 +143,11 @@ class _CreateWishScreenState extends State<CreateWishScreen> {
           _titleController.clear();
           _descriptionController.clear();
           _consequenceController.clear();
+          _tagController.clear();
           setState(() {
             _targetDate = null;
             _coverImage = null;
+            _selectedTags.clear();
           });
         }
       } else {
@@ -171,6 +226,108 @@ class _CreateWishScreenState extends State<CreateWishScreen> {
                           prefixIcon: const Icon(Icons.warning_amber_rounded),
                         ),
                         maxLines: 2,
+                      ),
+                      const SizedBox(height: 16),
+                      // Tags Section
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: _tagController,
+                            decoration: InputDecoration(
+                              labelText: 'Tags',
+                              hintText: 'Add tags (e.g., fitness, study)',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              prefixIcon: const Icon(Icons.label_rounded),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.add_rounded),
+                                onPressed: () {
+                                  if (_tagController.text.isNotEmpty) {
+                                    _addTag(_tagController.text);
+                                  }
+                                },
+                              ),
+                            ),
+                            onChanged: _searchTags,
+                            onSubmitted: (value) {
+                              if (value.isNotEmpty) {
+                                _addTag(value);
+                              }
+                            },
+                          ),
+                          // Tag suggestions
+                          if (_suggestedTags.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _suggestedTags.map((tag) {
+                                  return InkWell(
+                                    onTap: () => _addTag(tag['name']),
+                                    child: Chip(
+                                      label: Text(tag['name']),
+                                      avatar: const Icon(Icons.add, size: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          // Selected tags
+                          if (_selectedTags.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _selectedTags.map((tag) {
+                                  return Chip(
+                                    label: Text(tag),
+                                    deleteIcon: const Icon(Icons.close, size: 16),
+                                    onDeleted: () => _removeTag(tag),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          // Popular tags
+                          if (_popularTags.isNotEmpty && _selectedTags.isEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Popular tags:',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: _popularTags.map((tag) {
+                                      return InkWell(
+                                        onTap: () => _addTag(tag['name']),
+                                        child: Chip(
+                                          label: Text(tag['name']),
+                                          labelStyle: const TextStyle(fontSize: 12),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       InkWell(
