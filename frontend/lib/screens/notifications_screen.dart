@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
 import '../services/sync_service.dart';
+import '../services/storage_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'goal_detail_screen.dart';
+import 'feed_goal_detail_screen.dart';
 import '../models/wish.dart';
 import '../services/wish_service.dart';
 
@@ -86,30 +90,105 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final wishId = notification['wish_id'];
     if (wishId != null) {
       try {
-        final wishes = await WishService.getWishes();
-        final wish = wishes.firstWhere(
-          (w) => w.id == wishId,
-          orElse: () => throw Exception('Wish not found'),
-        );
-        
+        // Show loading
         if (mounted) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => GoalDetailScreen(wish: wish),
-            ),
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(child: CircularProgressIndicator()),
           );
+        }
+
+        // First, try to find in user's own wishes
+        final myWishes = await WishService.getWishes();
+        final myWish = myWishes.where((w) => w.id == wishId).firstOrNull;
+        
+        if (myWish != null) {
+          // It's my own wish - open in GoalDetailScreen
+          if (mounted) {
+            Navigator.pop(context); // Close loading
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => GoalDetailScreen(wish: myWish),
+              ),
+            );
+          }
+        } else {
+          // Not my wish - fetch from feed and open in FeedGoalDetailScreen
+          final feedItem = await _fetchFeedItem(wishId);
+          if (mounted) {
+            Navigator.pop(context); // Close loading
+            if (feedItem != null) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FeedGoalDetailScreen(feedItem: feedItem),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Goal not found or no longer accessible'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
         }
       } catch (e) {
         print('[NotificationsScreen] Error navigating to wish: $e');
         if (mounted) {
+          Navigator.pop(context); // Close loading if still showing
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Goal not found'),
+              content: Text('Failed to open goal'),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
+    }
+  }
+
+  Future<Map<String, dynamic>?> _fetchFeedItem(int wishId) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) return null;
+
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/api/wishes/$wishId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final wishData = json.decode(response.body);
+        
+        // Fetch user info
+        final userId = wishData['user_id'];
+        final userResponse = await http.get(
+          Uri.parse('http://10.0.2.2:8000/api/users/$userId'),
+          headers: {'Authorization': 'Bearer $token'},
+        );
+        
+        if (userResponse.statusCode == 200) {
+          final userData = json.decode(userResponse.body);
+          
+          return {
+            'wish': wishData,
+            'user': userData,
+            'engagement': {
+              'likes_count': 0,
+              'comments_count': 0,
+              'views_count': 0,
+              'is_liked': false,
+              'engagement_score': 0,
+            },
+          };
+        }
+      }
+      return null;
+    } catch (e) {
+      print('[NotificationsScreen] Error fetching feed item: $e');
+      return null;
     }
   }
 
@@ -123,6 +202,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.comment_rounded;
       case 'follow':
         return Icons.person_add_rounded;
+      case 'verification_request':
+      case 'verification_ready':
+        return Icons.verified_user_rounded;
+      case 'verification_complete':
+        return Icons.check_circle_rounded;
+      case 'verification_response':
+      case 'dispute_response':
+        return Icons.rate_review_rounded;
       default:
         return Icons.notifications_rounded;
     }
@@ -133,6 +220,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'like':
       case 'like_aggregated':
         return Colors.red;
+      case 'verification_request':
+      case 'verification_ready':
+        return Colors.blue;
+      case 'verification_complete':
+        return Colors.green;
+      case 'verification_response':
+      case 'dispute_response':
+        return Colors.orange;
       case 'comment':
       case 'comment_aggregated':
         return Colors.blue;

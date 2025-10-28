@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 class WishStatus(str, Enum):
@@ -40,11 +40,17 @@ class WishResponse(BaseModel):
     progress: int
     is_completed: bool
     status: str
+    progress_mode: str  # 'manual' or 'milestone'
+    visibility: str  # 'public', 'private', 'followers', 'friends'
     created_at: datetime
     target_date: Optional[datetime]
     consequence: Optional[str]
     cover_image: Optional[str]
     user_id: int
+    requires_verification: bool = False
+    completion_status: str = 'incomplete'
+    milestones: List[dict] = []
+    verifiers: List[dict] = []
 
     class Config:
         from_attributes = True

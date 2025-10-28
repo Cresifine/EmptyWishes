@@ -7,7 +7,7 @@ from app.models.user import User
 from app.models.follow import Follow
 from app.models.notification import Notification
 from app.api.users import get_current_user_from_token
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter()
 
@@ -58,7 +58,7 @@ def follow_user(
         type="follow",
         content=f"{current_user.username} started following you",
         is_read=False,
-        created_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc)
     )
     db.add(notification)
     

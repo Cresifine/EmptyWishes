@@ -81,6 +81,35 @@ class SyncService {
         print('[SyncService] Adding tags: ${wish['tags']}');
       }
 
+      // Add progress mode
+      print('[SyncService] DEBUG: progress_mode=${wish['progress_mode']}, milestones=${wish['milestones']}');
+      if (wish['progress_mode'] != null) {
+        request.fields['progress_mode'] = wish['progress_mode'];
+        print('[SyncService] Adding progress_mode: ${wish['progress_mode']}');
+      }
+
+      // Add milestones if present
+      if (wish['milestones'] != null && wish['milestones'] is List && (wish['milestones'] as List).isNotEmpty) {
+        final milestonesJson = json.encode(wish['milestones']);
+        request.fields['milestones'] = milestonesJson;
+        print('[SyncService] Adding milestones JSON: $milestonesJson');
+        print('[SyncService] Milestones count: ${(wish['milestones'] as List).length}');
+      } else {
+        print('[SyncService] No milestones to add');
+      }
+
+      // Add visibility
+      if (wish['visibility'] != null) {
+        request.fields['visibility'] = wish['visibility'];
+        print('[SyncService] Adding visibility: ${wish['visibility']}');
+      }
+
+      // Add verifier_ids if present
+      if (wish['verifier_ids'] != null && wish['verifier_ids'] is List && (wish['verifier_ids'] as List).isNotEmpty) {
+        request.fields['verifier_ids'] = json.encode(wish['verifier_ids']);
+        print('[SyncService] Adding verifier_ids: ${wish['verifier_ids']}');
+      }
+
       // Add local cover image if exists
       if (wish['local_cover_image'] != null) {
         final coverImagePath = wish['local_cover_image'];

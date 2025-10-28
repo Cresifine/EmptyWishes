@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Optional
+from datetime import datetime, timezone
 from app.schemas.engagement import LikeCreate, CommentCreate, CommentUpdate, ViewCreate, EngagementStats
 from app.database import get_db
 from app.models.like import Like
@@ -13,6 +14,14 @@ from app.api.users import get_current_user_from_token
 from app.api.notifications import create_notification
 
 router = APIRouter()
+
+def ensure_utc(dt):
+    """Ensure datetime is timezone-aware UTC"""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 @router.post("/likes", status_code=status.HTTP_201_CREATED)
 def toggle_like(
@@ -140,7 +149,7 @@ def get_comments(wish_id: int, db: Session = Depends(get_db)):
             "user_id": comment.user_id,
             "username": user.username if user else "Unknown",
             "content": comment.content,
-            "created_at": comment.created_at.isoformat()
+            "created_at": ensure_utc(comment.created_at).isoformat()
         })
     
     return result

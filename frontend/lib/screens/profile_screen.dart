@@ -21,6 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isOfflineMode = false;
   int _pendingWishesCount = 0;
+  int _pendingUpdatesCount = 0;
   int _followersCount = 0;
   int _followingCount = 0;
 
@@ -49,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     
     final pendingWishes = await StorageService.getPendingWishes();
+    final pendingUpdates = await StorageService.getPendingProgressUpdates();
     
     // Get followers/following counts if logged in
     int followersCount = 0;
@@ -70,6 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _userData = finalUserData;
         _userStats = finalUserData?['statistics'] ?? {};
         _pendingWishesCount = pendingWishes?.length ?? 0;
+        _pendingUpdatesCount = pendingUpdates?.length ?? 0;
         _followersCount = followersCount;
         _followingCount = followingCount;
         _isLoading = false;
@@ -82,13 +85,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _syncNow() async {
     setState(() => _isLoading = true);
     
-    final synced = await SyncService.syncPendingWishes();
+    // Count pending items before sync
+    final pendingWishes = await StorageService.getPendingWishes();
+    final pendingUpdates = await StorageService.getPendingProgressUpdates();
+    final pendingWishCount = pendingWishes?.length ?? 0;
+    final pendingUpdateCount = pendingUpdates?.length ?? 0;
+    
+    // Sync both wishes and progress updates
+    await SyncService.backgroundSync();
+    
+    // Count remaining pending items after sync
+    final remainingWishes = await StorageService.getPendingWishes();
+    final remainingUpdates = await StorageService.getPendingProgressUpdates();
+    final remainingWishCount = remainingWishes?.length ?? 0;
+    final remainingUpdateCount = remainingUpdates?.length ?? 0;
     
     if (mounted) {
+      final syncedWishes = pendingWishCount - remainingWishCount;
+      final syncedUpdates = pendingUpdateCount - remainingUpdateCount;
+      final allSynced = remainingWishCount == 0 && remainingUpdateCount == 0;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(synced ? 'Data synced successfully!' : 'Sync failed. Try again later.'),
-          backgroundColor: synced ? Colors.green : Colors.orange,
+          content: Text(
+            allSynced 
+              ? 'Data synced successfully!' 
+              : 'Synced $syncedWishes wishes and $syncedUpdates updates.\n$remainingWishCount wishes and $remainingUpdateCount updates still pending.'
+          ),
+          backgroundColor: allSynced ? Colors.green : Colors.orange,
+          duration: const Duration(seconds: 4),
         ),
       );
       await _loadUserData();
@@ -364,14 +389,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            if (_isOfflineMode && _pendingWishesCount > 0)
+            if (_isOfflineMode && (_pendingWishesCount > 0 || _pendingUpdatesCount > 0))
               Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 color: Colors.orange[50],
                 child: ListTile(
                   leading: const Icon(Icons.cloud_upload_rounded, color: Colors.orange),
-                  title: Text('$_pendingWishesCount wishes pending sync'),
-                  subtitle: const Text('Sign in to sync your data'),
+                  title: Text('${_pendingWishesCount + _pendingUpdatesCount} items pending sync'),
+                  subtitle: Text('$_pendingWishesCount wishes, $_pendingUpdatesCount updates - Sign in to sync'),
                   trailing: TextButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
@@ -382,13 +407,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-            if (!_isOfflineMode && _pendingWishesCount > 0)
+            if (!_isOfflineMode && (_pendingWishesCount > 0 || _pendingUpdatesCount > 0))
               Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 color: Colors.blue[50],
                 child: ListTile(
                   leading: const Icon(Icons.sync_rounded, color: Colors.blue),
-                  title: Text('$_pendingWishesCount wishes to sync'),
+                  title: Text('${_pendingWishesCount + _pendingUpdatesCount} items to sync'),
+                  subtitle: Text('$_pendingWishesCount wishes, $_pendingUpdatesCount updates'),
                   trailing: TextButton(
                     onPressed: _syncNow,
                     child: const Text('Sync Now'),

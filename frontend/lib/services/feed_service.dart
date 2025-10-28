@@ -80,6 +80,29 @@ class FeedService {
     }
   }
 
+  /// Get engagement stats for a wish
+  static Future<Map<String, dynamic>?> getEngagementStats(int wishId) async {
+    try {
+      print('[FeedService] Fetching engagement stats for wish $wishId');
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/engagements/wishes/$wishId/stats'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      print('[FeedService] Engagement stats response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        return data;
+      }
+      return null;
+    } catch (e) {
+      print('[FeedService] Error fetching engagement stats: $e');
+      return null;
+    }
+  }
+
   /// Toggle like on a wish
   static Future<Map<String, dynamic>?> toggleLike(int wishId) async {
     try {

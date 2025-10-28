@@ -45,9 +45,14 @@ class WishService {
     String? consequence,
     File? coverImage,
     List<String>? tags,
+    bool useMilestones = false,
+    List<Map<String, String>>? milestones,
+    String visibility = 'public',
+    List<int>? verifierIds,
   }) async {
     try {
       print('[WishService] Creating wish locally: $title');
+      print('[WishService] DEBUG: useMilestones=$useMilestones, milestones=$milestones');
       
       final wishId = DateTime.now().millisecondsSinceEpoch;
       
@@ -70,6 +75,10 @@ class WishService {
         'id': wishId, // Temporary local ID
         'local_cover_image': localCoverImagePath, // Store local path
         'tags': tags ?? [],
+        'progress_mode': useMilestones ? 'milestone' : 'manual',
+        'milestones': milestones ?? [],
+        'visibility': visibility,
+        'verifier_ids': verifierIds ?? [],
         'synced': false,
       };
 
@@ -172,33 +181,84 @@ class WishService {
 
   static Future<bool> markAsFailed(int wishId) async {
     try {
-      final token = await StorageService.getToken();
-      if (token == null) {
-        print('[WishService] No token found');
-        return false;
+      final hasToken = await StorageService.hasToken();
+      final isOnline = await SyncService.isOnline();
+      final isOfflineMode = await StorageService.isOfflineMode();
+
+      print('[WishService] Marking wish $wishId as failed - Online: $isOnline, HasToken: $hasToken, OfflineMode: $isOfflineMode');
+
+      // ALWAYS update locally first (offline-first approach)
+      await _updateLocalWishStatus(wishId, 'failed');
+
+      // Try to sync with backend if online and authenticated
+      if (isOnline && hasToken && !isOfflineMode) {
+        try {
+          final token = await StorageService.getToken();
+          print('[WishService] Syncing failed status to backend');
+          final response = await http.post(
+            Uri.parse('$baseUrl/api/wishes/$wishId/mark-failed'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+          ).timeout(const Duration(seconds: 10));
+
+          print('[WishService] Mark as failed response status: ${response.statusCode}');
+
+          if (response.statusCode == 200) {
+            print('[WishService] Successfully synced failed status to backend');
+          } else {
+            print('[WishService] Failed to sync to backend: ${response.body}');
+            // Still return true since we updated locally
+          }
+        } catch (e) {
+          print('[WishService] Error syncing to backend: $e');
+          // Still return true since we updated locally
+        }
       }
 
-      print('[WishService] Marking wish $wishId as failed');
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/wishes/$wishId/mark-failed'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 10));
-
-      print('[WishService] Mark as failed response status: ${response.statusCode}');
-
-      if (response.statusCode == 200) {
-        print('[WishService] Successfully marked wish as failed');
-        return true;
-      } else {
-        print('[WishService] Failed to mark wish as failed: ${response.body}');
-        return false;
-      }
+      return true;
     } catch (e) {
       print('[WishService] Error marking wish as failed: $e');
       return false;
+    }
+  }
+
+  static Future<void> _updateLocalWishStatus(int wishId, String status) async {
+    try {
+      // Update cached wishes
+      final cachedWishes = await StorageService.getCachedWishes();
+      if (cachedWishes != null) {
+        for (var wish in cachedWishes) {
+          if (wish['id'] == wishId) {
+            wish['status'] = status;
+            if (status == 'failed') {
+              wish['is_completed'] = false;
+            }
+            break;
+          }
+        }
+        await StorageService.cacheWishes(cachedWishes);
+        print('[WishService] Updated cached wish status to $status');
+      }
+
+      // Update pending wishes
+      final pendingWishes = await StorageService.getPendingWishes();
+      if (pendingWishes != null) {
+        for (var wish in pendingWishes) {
+          if (wish['id'] == wishId) {
+            wish['status'] = status;
+            if (status == 'failed') {
+              wish['is_completed'] = false;
+            }
+            break;
+          }
+        }
+        await StorageService.savePendingWishes(pendingWishes);
+        print('[WishService] Updated pending wish status to $status');
+      }
+    } catch (e) {
+      print('[WishService] Error updating local wish status: $e');
     }
   }
 }

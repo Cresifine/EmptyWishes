@@ -3,6 +3,11 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../services/feed_service.dart';
 import '../services/progress_update_service.dart';
 import '../services/sync_service.dart';
+import '../services/milestone_service.dart';
+import '../services/verification_service.dart';
+import '../services/auth_service.dart';
+import '../services/storage_service.dart';
+import '../models/milestone.dart';
 import 'feed_screen.dart';
 import 'user_profile_screen.dart';
 
@@ -20,18 +25,28 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
   final _scrollController = ScrollController();
   List<Map<String, dynamic>> _comments = [];
   List<Map<String, dynamic>> _progressUpdates = [];
+  List<Milestone> _milestones = [];
+  List<Map<String, dynamic>> _verifications = [];
+  String? _ownerDisputeResponse;
   bool _isLoadingComments = true;
   bool _isLoadingProgress = true;
+  bool _isLoadingMilestones = true;
+  bool _isLoadingVerifications = false;
   bool _isOnline = false;
+  int? _currentUserId;
   late Map<String, dynamic> _currentFeedItem;
+  final MilestoneService _milestoneService = MilestoneService();
 
   @override
   void initState() {
     super.initState();
     _currentFeedItem = widget.feedItem;
     _checkOnlineStatus();
+    _loadCurrentUser();
     _loadComments();
     _loadProgressUpdates();
+    _loadMilestones();
+    _loadVerifications();
     _recordView();
   }
 
@@ -46,6 +61,215 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
     final online = await SyncService.isOnline();
     if (mounted) {
       setState(() => _isOnline = online);
+    }
+  }
+
+  Future<void> _loadCurrentUser() async {
+    try {
+      final currentUser = await AuthService.getCurrentUser();
+      if (mounted && currentUser != null) {
+        setState(() {
+          _currentUserId = currentUser['id'];
+        });
+      }
+    } catch (e) {
+      print('[FeedGoalDetail] Error loading current user: $e');
+    }
+  }
+
+  Future<void> _loadVerifications() async {
+    final wish = _currentFeedItem['wish'];
+    if (wish['requires_verification'] != true) return;
+    
+    setState(() => _isLoadingVerifications = true);
+    
+    try {
+      final response = await VerificationService.getVerifications(wish['id']);
+      
+      if (mounted) {
+        setState(() {
+          _verifications = response['verifications'] ?? [];
+          _ownerDisputeResponse = response['owner_dispute_response'];
+          _isLoadingVerifications = false;
+        });
+        
+        // Debug: Log verification details
+        print('[FeedGoalDetail] Loaded ${_verifications.length} verifications');
+        for (var v in _verifications) {
+          print('[FeedGoalDetail] Verification: ${v['verifier']['username']} - ${v['status']} - dispute_reason: ${v['dispute_reason']} - comment: ${v['comment']}');
+        }
+        if (_ownerDisputeResponse != null) {
+          print('[FeedGoalDetail] Owner response: $_ownerDisputeResponse');
+        }
+      }
+    } catch (e) {
+      print('[FeedGoalDetail] Error loading verifications: $e');
+      if (mounted) {
+        setState(() => _isLoadingVerifications = false);
+      }
+    }
+  }
+
+  Future<void> _handleVerification(bool approved) async {
+    final TextEditingController commentController = TextEditingController();
+    final TextEditingController disputeController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(approved ? 'Approve Goal' : 'Dispute Goal'),
+        content: approved
+            ? TextField(
+                controller: commentController,
+                decoration: const InputDecoration(
+                  labelText: 'Comment (optional)',
+                  hintText: 'Add your feedback...',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              )
+            : TextField(
+                controller: disputeController,
+                decoration: const InputDecoration(
+                  labelText: 'Reason for dispute',
+                  hintText: 'Why are you disputing this?',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(approved ? 'Approve' : 'Dispute'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final wish = _currentFeedItem['wish'];
+      final success = await VerificationService.verifyCompletion(
+        wishId: wish['id'],
+        status: approved ? 'approved' : 'disputed',
+        comment: approved && commentController.text.isNotEmpty ? commentController.text : null,
+        disputeReason: !approved && disputeController.text.isNotEmpty ? disputeController.text : null,
+      );
+
+      if (mounted) Navigator.pop(context); // Close loading
+
+      if (success) {
+        await _loadVerifications();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(approved ? 'Goal approved!' : 'Goal disputed'),
+              backgroundColor: approved ? Colors.green : Colors.orange,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to submit verification'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _handleVerifierReply() async {
+    final TextEditingController replyController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reply to Owner'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Respond to the owner\'s explanation. You can then approve or re-dispute the goal.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: replyController,
+              decoration: const InputDecoration(
+                labelText: 'Your reply',
+                hintText: 'Type your response...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 4,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Send Reply'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && replyController.text.trim().isNotEmpty) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Get the current user's verification
+      final myVerification = _verifications.firstWhere(
+        (v) => v['verifier']['id'] == _currentUserId && v['status'] == 'disputed'
+      );
+
+      final wish = _currentFeedItem['wish'];
+      final success = await VerificationService.verifierReplyToOwner(
+        wishId: wish['id'],
+        verificationId: myVerification['id'],
+        reply: replyController.text.trim(),
+      );
+
+      if (mounted) Navigator.pop(context); // Close loading
+
+      if (success) {
+        await _loadVerifications();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Reply sent to owner!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to send reply'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -103,6 +327,27 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
       print('[FeedGoalDetail] Error loading progress updates: $e');
       if (mounted) {
         setState(() => _isLoadingProgress = false);
+      }
+    }
+  }
+
+  Future<void> _loadMilestones() async {
+    setState(() => _isLoadingMilestones = true);
+    
+    try {
+      final wish = _currentFeedItem['wish'];
+      final milestones = await _milestoneService.getWishMilestones(wish['id']);
+      
+      if (mounted) {
+        setState(() {
+          _milestones = milestones;
+          _isLoadingMilestones = false;
+        });
+      }
+    } catch (e) {
+      print('[FeedGoalDetail] Error loading milestones: $e');
+      if (mounted) {
+        setState(() => _isLoadingMilestones = false);
       }
     }
   }
@@ -220,11 +465,13 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
                 ),
               ),
             ),
-          IconButton(
+            IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               _loadComments();
               _loadProgressUpdates();
+              _loadMilestones();
+              _loadVerifications();
             },
           ),
         ],
@@ -257,6 +504,14 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
                   _buildProgressUpdatesSection(),
                   
                   const Divider(height: 1),
+                  
+                  // Milestones section
+                  if (_milestones.isNotEmpty) _buildMilestonesSection(),
+                  
+                  if (_milestones.isNotEmpty) const Divider(height: 1),
+                  
+                  // Verifications section
+                  _buildVerificationsSection(),
                   
                   // Comments section
                   _buildCommentsSection(),
@@ -596,6 +851,379 @@ class _FeedGoalDetailScreenState extends State<FeedGoalDetailScreen> {
               isLast: index == _progressUpdates.length - 1,
             ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildMilestonesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const Icon(Icons.flag_outlined, size: 20, color: Colors.blue),
+              const SizedBox(width: 8),
+              const Text(
+                'Milestones',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${_milestones.where((m) => m.isCompleted).length}/${_milestones.length}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_isLoadingMilestones)
+          const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (_milestones.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(
+              child: Text(
+                'No milestones set',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: List.generate(_milestones.length, (index) {
+                final milestone = _milestones[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  elevation: 1,
+                  child: ListTile(
+                    dense: true,
+                    leading: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: milestone.isCompleted
+                          ? Colors.green.withOpacity(0.2)
+                          : Colors.blue.withOpacity(0.2),
+                      child: Icon(
+                        milestone.isCompleted
+                            ? Icons.check_circle
+                            : Icons.circle_outlined,
+                        size: 20,
+                        color: milestone.isCompleted ? Colors.green : Colors.blue,
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            milestone.title,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              decoration: milestone.isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.star, size: 10, color: Colors.amber),
+                              const SizedBox(width: 2),
+                              Text(
+                                '${milestone.points}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: milestone.description != null && milestone.description!.isNotEmpty
+                        ? Text(
+                            milestone.description!,
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        : null,
+                  ),
+                );
+              }),
+            ),
+          ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildVerificationsSection() {
+    final wish = _currentFeedItem['wish'];
+    if (wish['requires_verification'] != true) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 1),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.verified_user_rounded, size: 20, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Verification Required',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (_verifications.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${_verifications.where((v) => v['status'] == 'approved').length}/${_verifications.length}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (_isLoadingVerifications)
+                const Center(child: CircularProgressIndicator())
+              else if (_verifications.isEmpty)
+                Text(
+                  'No verifiers assigned yet',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                )
+              else
+                Column(
+                  children: _verifications.map((verification) {
+                    final isPending = verification['status'] == 'pending';
+                    final isApproved = verification['status'] == 'approved';
+                    final isDisputed = verification['status'] == 'disputed';
+                    final verifierId = verification['verifier'] != null 
+                        ? verification['verifier']['id']
+                        : null;
+                    final isVerifier = _currentUserId != null && _currentUserId == verifierId;
+                    
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      elevation: 1,
+                      child: ListTile(
+                        dense: true,
+                        leading: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: isApproved
+                              ? Colors.green.withOpacity(0.2)
+                              : isDisputed
+                                  ? Colors.orange.withOpacity(0.2)
+                                  : Colors.grey.withOpacity(0.2),
+                          child: Icon(
+                            isApproved
+                                ? Icons.check_circle
+                                : isDisputed
+                                    ? Icons.error_outline
+                                    : Icons.schedule,
+                            size: 20,
+                            color: isApproved
+                                ? Colors.green
+                                : isDisputed
+                                    ? Colors.orange
+                                    : Colors.grey,
+                          ),
+                        ),
+                        title: Text(
+                          verification['verifier'] != null 
+                              ? verification['verifier']['username'] ?? 'Unknown'
+                              : 'Unknown',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: isDisputed && verification['dispute_reason'] != null
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Dispute reason:',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange[900],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    verification['dispute_reason'],
+                                    style: const TextStyle(fontSize: 12),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              )
+                            : verification['comment'] != null
+                                ? Text(
+                                    verification['comment'],
+                                    style: const TextStyle(fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  )
+                                : Text(
+                                    isPending ? 'Pending review' : verification['status'],
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                        trailing: isVerifier && isPending
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+                                    onPressed: () => _handleVerification(true),
+                                    tooltip: 'Approve',
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    icon: const Icon(Icons.cancel_outlined, color: Colors.orange),
+                                    onPressed: () => _handleVerification(false),
+                                    tooltip: 'Dispute',
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ],
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              
+              // Owner's Dispute Response
+              if (_ownerDisputeResponse != null && _ownerDisputeResponse!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue[200]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.reply_rounded, size: 16, color: Colors.blue[700]),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Owner\'s Response',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue[900],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _ownerDisputeResponse!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      
+                      // Show verifier's reply if exists
+                      if (_verifications.isNotEmpty && _verifications.first['verifier_reply_to_owner'] != null) ...[
+                        const SizedBox(height: 12),
+                        const Divider(),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.message_rounded, size: 16, color: Colors.orange[700]),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Your Reply',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange[900],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _verifications.first['verifier_reply_to_owner'],
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                      
+                      // Reply button for verifier (only if they haven't replied yet and they disputed)
+                      if (_verifications.isNotEmpty && 
+                          _verifications.any((v) => 
+                            v['verifier']['id'] == _currentUserId && 
+                            v['status'] == 'disputed' &&
+                            (v['verifier_reply_to_owner'] == null || v['verifier_reply_to_owner'].isEmpty)
+                          )) ...[
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: _handleVerifierReply,
+                          icon: const Icon(Icons.reply_rounded, size: 18),
+                          label: const Text('Reply to Owner'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[600],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ],
     );
   }

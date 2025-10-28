@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends, Header, UploadFil
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.schemas.wish import WishCreate, WishUpdate, WishResponse
 from app.database import get_db
 from app.models.wish import Wish
@@ -26,12 +26,32 @@ router = APIRouter()
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+def ensure_utc(dt):
+    """Ensure datetime is timezone-aware UTC"""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        # Naive datetime, assume it's UTC
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
 def auto_update_wish_status(wish: Wish):
     """Automatically update wish status based on progress and deadline"""
+    from app.models.wish import CompletionStatus
+    
     if wish.progress >= 100:
-        wish.status = "completed"
-        wish.is_completed = True
-    elif wish.target_date and wish.target_date < datetime.utcnow() and wish.progress < 100:
+        if wish.requires_verification:
+            # If verification is required, set status to pending verification
+            wish.completion_status = CompletionStatus.PENDING_VERIFICATION
+            # Don't mark as completed yet - wait for verification
+            print(f"[wishes] Wish {wish.id} reached 100% - pending verification")
+        else:
+            # No verification required - mark as completed
+            wish.status = "completed"
+            wish.is_completed = True
+            wish.completion_status = CompletionStatus.SELF_VERIFIED
+            print(f"[wishes] Wish {wish.id} reached 100% - auto-completed (no verification required)")
+    elif wish.target_date and wish.target_date < datetime.now(timezone.utc) and wish.progress < 100:
         wish.status = "missed"
     return wish
 
@@ -43,6 +63,9 @@ async def create_wish(
     consequence: Optional[str] = Form(None),
     visibility: str = Form("public"),  # public, followers, friends, private
     tags: Optional[str] = Form(None),  # JSON array of tag names
+    progress_mode: str = Form("manual"),  # manual or milestone
+    milestones: Optional[str] = Form(None),  # JSON array of milestone objects
+    verifier_ids: Optional[str] = Form(None),  # JSON array of user IDs who will verify completion
     cover_image: Optional[UploadFile] = File(None),
     files: List[UploadFile] = File([]),
     authorization: Optional[str] = Header(None),
@@ -83,10 +106,12 @@ async def create_wish(
         cover_image=cover_image_url,
         visibility=visibility,
         user_id=user_id,
-        status="current"
+        status="current",
+        progress_mode=progress_mode,
+        requires_verification=verifier_ids is not None and len(verifier_ids.strip()) > 2  # Check if verifiers provided
     )
     db.add(db_wish)
-    db.flush()  # Get the ID for attachments and tags
+    db.flush()  # Get the ID for attachments, tags, milestones, and verifiers
     
     # Handle tags
     if tags:
@@ -99,6 +124,26 @@ async def create_wish(
                     tag.usage_count += 1
         except json.JSONDecodeError:
             print(f"[create_wish] Failed to parse tags JSON: {tags}")
+    
+    # Handle milestones
+    print(f"[create_wish] DEBUG: progress_mode={progress_mode}, milestones={milestones}")
+    if milestones and progress_mode == "milestone":
+        try:
+            from app.models.milestone import Milestone
+            milestone_data = json.loads(milestones)
+            print(f"[create_wish] Parsed milestone data: {milestone_data}")
+            for idx, milestone_item in enumerate(milestone_data):
+                milestone = Milestone(
+                    wish_id=db_wish.id,
+                    title=milestone_item.get('title', ''),
+                    description=milestone_item.get('description', ''),
+                    order_index=idx,
+                    points=int(milestone_item.get('points', 1))  # Default to 1 point if not specified
+                )
+                db.add(milestone)
+            print(f"[create_wish] Created {len(milestone_data)} milestones for wish {db_wish.id}")
+        except json.JSONDecodeError as e:
+            print(f"[create_wish] Failed to parse milestones JSON: {milestones}, error: {e}")
     
     # Handle file attachments
     for file in files:
@@ -126,10 +171,60 @@ async def create_wish(
             )
             db.add(attachment)
     
+    # Handle verifiers
+    if verifier_ids:
+        try:
+            from app.models.completion_verification import CompletionVerification, VerificationStatus
+            from app.api.notifications import create_notification
+            verifier_id_list = json.loads(verifier_ids)
+            print(f"[create_wish] Parsed verifier IDs: {verifier_id_list}")
+            
+            # Remove duplicates and self
+            verifier_id_list = [vid for vid in set(verifier_id_list) if vid != user_id]
+            
+            if len(verifier_id_list) > 0:
+                # Create verification records
+                for verifier_id in verifier_id_list:
+                    # Check if verifier exists
+                    verifier = db.query(User).filter(User.id == verifier_id).first()
+                    if verifier:
+                        verification = CompletionVerification(
+                            wish_id=db_wish.id,
+                            verifier_user_id=verifier_id,
+                            status=VerificationStatus.PENDING
+                        )
+                        db.add(verification)
+                        
+                        # Send notification to verifier
+                        try:
+                            current_user = db.query(User).filter(User.id == user_id).first()
+                            create_notification(
+                                db=db,
+                                user_id=verifier_id,
+                                actor_id=user_id,
+                                notification_type="verification_request",
+                                wish_id=db_wish.id,
+                                content=f"{current_user.username if current_user else 'Someone'} has selected you to verify their goal: {db_wish.title}"
+                            )
+                        except Exception as e:
+                            print(f"[create_wish] Failed to create notification: {e}")
+                
+                print(f"[create_wish] Created {len(verifier_id_list)} verification records for wish {db_wish.id}")
+        except json.JSONDecodeError as e:
+            print(f"[create_wish] Failed to parse verifier_ids JSON: {verifier_ids}, error: {e}")
+    
     db.commit()
     db.refresh(db_wish)
     
-    # Return with attachments and tags
+    # Get milestones
+    from app.models.milestone import Milestone
+    milestones = db.query(Milestone).filter(Milestone.wish_id == db_wish.id).order_by(Milestone.order_index).all()
+    
+    # Get verifiers
+    from app.models.completion_verification import CompletionVerification
+    verifications = db.query(CompletionVerification).filter(CompletionVerification.wish_id == db_wish.id).all()
+    
+    # Return with attachments, tags, milestones, and verifications
     return {
         "id": db_wish.id,
         "title": db_wish.title,
@@ -142,7 +237,31 @@ async def create_wish(
         "consequence": db_wish.consequence,
         "cover_image": db_wish.cover_image,
         "user_id": db_wish.user_id,
+        "progress_mode": db_wish.progress_mode,
+        "requires_verification": db_wish.requires_verification,
+        "completion_status": db_wish.completion_status.value if hasattr(db_wish.completion_status, 'value') else db_wish.completion_status,
         "tags": [{"id": tag.id, "name": tag.name} for tag in db_wish.tags],
+        "milestones": [
+            {
+                "id": m.id,
+                "title": m.title,
+                "description": m.description,
+                "order_index": m.order_index,
+                "points": m.points,
+                "is_completed": m.is_completed,
+                "completed_at": m.completed_at.isoformat() if m.completed_at else None
+            }
+            for m in milestones
+        ],
+        "verifiers": [
+            {
+                "id": v.id,
+                "verifier_user_id": v.verifier_user_id,
+                "status": v.status.value if hasattr(v.status, 'value') else v.status,
+                "verified_at": v.verified_at.isoformat() if v.verified_at else None
+            }
+            for v in verifications
+        ],
         "attachments": [
             {
                 "id": att.id,
@@ -155,12 +274,15 @@ async def create_wish(
         ]
     }
 
-@router.get("", response_model=List[WishResponse])
+@router.get("")
 def get_wishes(
     status_filter: Optional[str] = None,
     authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
+    from app.models.milestone import Milestone
+    from app.models.completion_verification import CompletionVerification
+    
     # Try to get user from token, default to user_id=1 if offline/no token
     user_id = 1
     if authorization and authorization.startswith("Bearer "):
@@ -186,7 +308,52 @@ def get_wishes(
     else:
         wishes = all_wishes
     
-    return wishes
+    # Build response with milestones and verifiers
+    result = []
+    for wish in wishes:
+        milestones = db.query(Milestone).filter(Milestone.wish_id == wish.id).order_by(Milestone.order_index).all()
+        verifications = db.query(CompletionVerification).filter(CompletionVerification.wish_id == wish.id).all()
+        
+        result.append({
+            "id": wish.id,
+            "title": wish.title,
+            "description": wish.description,
+            "progress": wish.progress,
+            "is_completed": wish.is_completed,
+            "status": wish.status,
+            "created_at": ensure_utc(wish.created_at).isoformat(),
+            "target_date": ensure_utc(wish.target_date).isoformat() if wish.target_date else None,
+            "consequence": wish.consequence,
+            "cover_image": wish.cover_image,
+            "user_id": wish.user_id,
+            "progress_mode": wish.progress_mode,
+            "visibility": wish.visibility,
+            "requires_verification": wish.requires_verification,
+            "completion_status": wish.completion_status.value if hasattr(wish.completion_status, 'value') else wish.completion_status,
+            "milestones": [
+                {
+                    "id": m.id,
+                    "title": m.title,
+                    "description": m.description,
+                    "order_index": m.order_index,
+                    "points": m.points,
+                    "is_completed": m.is_completed,
+                    "completed_at": ensure_utc(m.completed_at).isoformat() if m.completed_at else None
+                }
+                for m in milestones
+            ],
+            "verifiers": [
+                {
+                    "id": v.id,
+                    "verifier_user_id": v.verifier_user_id,
+                    "status": v.status.value if hasattr(v.status, 'value') else v.status,
+                    "verified_at": ensure_utc(v.verified_at).isoformat() if v.verified_at else None
+                }
+                for v in verifications
+            ],
+        })
+    
+    return result
 
 @router.get("/public/feed")
 def get_public_feed(
@@ -231,10 +398,11 @@ def get_public_feed(
         friends_ids = list(set(following_ids) & set(followers_ids))
         
         # Build visibility filter
-        # Show: public posts, own posts, posts from followed users if visibility allows
+        # Show: public posts, own NON-PRIVATE posts, posts from followed users if visibility allows
         visibility_conditions = [
             Wish.visibility == "public",  # Public posts
-            Wish.user_id == current_user_id,  # Own posts
+            # Own posts, but exclude private ones from feed
+            (Wish.user_id == current_user_id) & (Wish.visibility != "private"),
         ]
         
         # Posts visible to followers (if user is following the poster)
@@ -297,8 +465,8 @@ def get_public_feed(
                 "progress": wish.progress,
                 "is_completed": wish.is_completed,
                 "status": wish.status,
-                "created_at": wish.created_at.isoformat(),
-                "target_date": wish.target_date.isoformat() if wish.target_date else None,
+                "created_at": ensure_utc(wish.created_at).isoformat(),
+                "target_date": ensure_utc(wish.target_date).isoformat() if wish.target_date else None,
                 "cover_image": wish.cover_image,
                 "consequence": wish.consequence,
                 "tags": [{"id": tag.id, "name": tag.name} for tag in wish.tags],
@@ -338,12 +506,59 @@ def get_public_feed(
     
     return feed_items
 
-@router.get("/{wish_id}", response_model=WishResponse)
+@router.get("/{wish_id}")
 def get_wish(wish_id: int, db: Session = Depends(get_db)):
+    from app.models.milestone import Milestone
+    from app.models.completion_verification import CompletionVerification
+    
     wish = db.query(Wish).filter(Wish.id == wish_id).first()
     if not wish:
         raise HTTPException(status_code=404, detail="Wish not found")
-    return wish
+    
+    # Get milestones
+    milestones = db.query(Milestone).filter(Milestone.wish_id == wish.id).order_by(Milestone.order_index).all()
+    
+    # Get verifiers
+    verifications = db.query(CompletionVerification).filter(CompletionVerification.wish_id == wish.id).all()
+    
+    return {
+        "id": wish.id,
+        "title": wish.title,
+        "description": wish.description,
+        "progress": wish.progress,
+        "is_completed": wish.is_completed,
+        "status": wish.status,
+        "created_at": ensure_utc(wish.created_at).isoformat(),
+        "target_date": ensure_utc(wish.target_date).isoformat() if wish.target_date else None,
+        "consequence": wish.consequence,
+        "cover_image": wish.cover_image,
+        "user_id": wish.user_id,
+        "progress_mode": wish.progress_mode,
+        "visibility": wish.visibility,
+        "requires_verification": wish.requires_verification,
+        "completion_status": wish.completion_status.value if hasattr(wish.completion_status, 'value') else wish.completion_status,
+        "milestones": [
+            {
+                "id": m.id,
+                "title": m.title,
+                "description": m.description,
+                "order_index": m.order_index,
+                "points": m.points,
+                "is_completed": m.is_completed,
+                "completed_at": ensure_utc(m.completed_at).isoformat() if m.completed_at else None
+            }
+            for m in milestones
+        ],
+        "verifiers": [
+            {
+                "id": v.id,
+                "verifier_user_id": v.verifier_user_id,
+                "status": v.status.value if hasattr(v.status, 'value') else v.status,
+                "verified_at": ensure_utc(v.verified_at).isoformat() if v.verified_at else None
+            }
+            for v in verifications
+        ],
+    }
 
 @router.patch("/{wish_id}", response_model=WishResponse)
 def update_wish(

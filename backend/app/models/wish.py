@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, Enum as SQLEnum
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from app.database import Base
 import enum
 
@@ -10,6 +10,13 @@ class WishStatus(str, enum.Enum):
     FAILED = "failed"
     ARCHIVED = "archived"
     MISSED = "missed"
+
+class CompletionStatus(str, enum.Enum):
+    INCOMPLETE = "incomplete"
+    PENDING_VERIFICATION = "pending_verification"
+    VERIFIED = "verified"
+    DISPUTED = "disputed"
+    SELF_VERIFIED = "self_verified"  # No verification requested
 
 class WishVisibility(str, enum.Enum):
     PUBLIC = "public"  # Anyone can see
@@ -27,14 +34,22 @@ class Wish(Base):
     is_completed = Column(Boolean, default=False)
     status = Column(SQLEnum(WishStatus), default=WishStatus.CURRENT, nullable=False)
     visibility = Column(SQLEnum(WishVisibility), default=WishVisibility.PUBLIC, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     target_date = Column(DateTime, nullable=True)
     consequence = Column(Text, nullable=True)  # What happens if goal is not completed
     cover_image = Column(String, nullable=True)  # Cover/main image for the goal
+    progress_mode = Column(String, default="manual")  # manual or milestone
     user_id = Column(Integer, ForeignKey("users.id"))
+    
+    # Verification fields
+    requires_verification = Column(Boolean, default=False)  # Does this goal need verification?
+    completion_status = Column(SQLEnum(CompletionStatus), default=CompletionStatus.INCOMPLETE, nullable=False)
+    owner_dispute_response = Column(Text, nullable=True)  # Owner's response to disputes
 
     owner = relationship("User", back_populates="wishes")
     progress_updates = relationship("ProgressUpdate", back_populates="wish", cascade="all, delete-orphan")
     attachments = relationship("Attachment", back_populates="wish", cascade="all, delete-orphan")
     tags = relationship("Tag", secondary="wish_tags", back_populates="wishes")
+    milestones = relationship("Milestone", back_populates="wish", cascade="all, delete-orphan")
+    completion_verifications = relationship("CompletionVerification", back_populates="wish", cascade="all, delete-orphan")
 

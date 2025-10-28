@@ -133,12 +133,18 @@ class AuthService {
   }
 
   static Future<void> logout() async {
-    print('[AuthService] Logging out - preserving local data');
-    // Only clear auth-related data, keep ALL local wishes/updates/files
+    print('[AuthService] Logging out - clearing cached backend data');
+    
+    // Clear auth-related data
     await StorageService.deleteToken();
     await StorageService.deleteUser();
+    
+    // Clear cached backend data (prevent data leakage between accounts)
+    // But keep pending data that was created offline and needs to sync
+    await StorageService.clearCachedBackendData();
+    
     await StorageService.setOfflineMode(true);
-    print('[AuthService] Logout complete - all local data preserved');
+    print('[AuthService] Logout complete - cached data cleared, pending data preserved');
   }
 
   static Future<bool> isLoggedIn() async {

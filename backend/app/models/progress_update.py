@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from app.database import Base
 
 class ProgressUpdate(Base):
@@ -12,7 +12,7 @@ class ProgressUpdate(Base):
     content = Column(Text, nullable=False)  # Update text/comment
     image_url = Column(String, nullable=True)  # Optional photo with the update
     progress_value = Column(Integer, nullable=True)  # Optional progress snapshot at this update
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     wish = relationship("Wish", back_populates="progress_updates")
     user = relationship("User")

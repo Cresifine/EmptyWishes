@@ -174,6 +174,18 @@ class StorageService {
     await prefs.remove(_cachedProgressUpdatesKey);
   }
 
+  // Clear cached backend data (for logout) but keep pending data
+  static Future<void> clearCachedBackendData() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Clear cached data from backend (prevents data leakage between accounts)
+    await prefs.remove(_wishesKey);
+    await prefs.remove(_cachedProgressUpdatesKey);
+    await prefs.remove(_feedCacheKey);
+    // Note: pending_wishes and pending_progress_updates are NOT cleared
+    // They contain offline-created data that needs to sync
+    print('[StorageService] Cleared cached backend data, kept pending data');
+  }
+
   // Clear all data except offline wishes
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();

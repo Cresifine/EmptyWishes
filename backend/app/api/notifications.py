@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, and_
 from typing import Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 from app.database import get_db
 from app.models.notification import Notification
@@ -30,7 +30,7 @@ def create_notification(
         return None
     
     # Check for existing notifications to aggregate
-    time_threshold = datetime.utcnow() - timedelta(hours=AGGREGATION_WINDOW_HOURS)
+    time_threshold = datetime.now(timezone.utc) - timedelta(hours=AGGREGATION_WINDOW_HOURS)
     
     existing = db.query(Notification).filter(
         Notification.user_id == user_id,
@@ -47,7 +47,7 @@ def create_notification(
             if actor_id not in actor_ids:
                 actor_ids.append(actor_id)
                 existing.actor_ids = json.dumps(actor_ids)
-                existing.updated_at = datetime.utcnow()
+                existing.updated_at = datetime.now(timezone.utc)
                 existing.is_read = False  # Mark as unread again
                 db.commit()
         else:
@@ -64,7 +64,7 @@ def create_notification(
                 existing.type = f"{notification_type}_aggregated"
                 existing.actor_ids = json.dumps([existing.actor_id, actor_id])
                 existing.actor_id = None
-                existing.updated_at = datetime.utcnow()
+                existing.updated_at = datetime.now(timezone.utc)
                 existing.is_read = False
                 db.commit()
             else:
@@ -116,14 +116,18 @@ def get_notifications(
     # Enrich notifications with user and wish data
     result = []
     for notif in notifications:
+        # Ensure timestamps are timezone-aware
+        created_at = notif.created_at if notif.created_at.tzinfo else notif.created_at.replace(tzinfo=timezone.utc)
+        updated_at = notif.updated_at if notif.updated_at.tzinfo else notif.updated_at.replace(tzinfo=timezone.utc)
+        
         notif_data = {
             "id": notif.id,
             "type": notif.type,
             "wish_id": notif.wish_id,
             "content": notif.content,
             "is_read": notif.is_read,
-            "created_at": notif.created_at.isoformat(),
-            "updated_at": notif.updated_at.isoformat(),
+            "created_at": created_at.isoformat(),
+            "updated_at": updated_at.isoformat(),
         }
         
         # Get wish info

@@ -6,6 +6,7 @@ import '../services/tag_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'feed_goal_detail_screen.dart';
 import 'user_profile_screen.dart';
+import 'search_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String? initialTag;
@@ -22,10 +23,7 @@ class _FeedScreenState extends State<FeedScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Following', 'Popular', 'Recent'];
   List<Map<String, dynamic>> _feedItems = [];
-  final TextEditingController _searchController = TextEditingController();
   String? _selectedTag;
-  List<Map<String, dynamic>> _tagSuggestions = [];
-  bool _showSearchBar = false;
 
   @override
   void initState() {
@@ -34,12 +32,6 @@ class _FeedScreenState extends State<FeedScreen> {
       _selectedTag = widget.initialTag;
     }
     _loadFeed();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadFeed() async {
@@ -60,24 +52,9 @@ class _FeedScreenState extends State<FeedScreen> {
     }
   }
 
-  Future<void> _searchTags(String query) async {
-    if (query.length < 2) {
-      setState(() => _tagSuggestions = []);
-      return;
-    }
-    
-    final tags = await TagService.searchTags(query);
-    if (mounted) {
-      setState(() => _tagSuggestions = tags);
-    }
-  }
-
   void _filterByTag(String tagName) {
     setState(() {
       _selectedTag = tagName.toLowerCase();
-      _searchController.clear();
-      _tagSuggestions = [];
-      _showSearchBar = false;
     });
     _loadFeed();
   }
@@ -85,8 +62,6 @@ class _FeedScreenState extends State<FeedScreen> {
   void _clearTagFilter() {
     setState(() {
       _selectedTag = null;
-      _searchController.clear();
-      _tagSuggestions = [];
     });
     _loadFeed();
   }
@@ -95,24 +70,7 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _showSearchBar
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search tags...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
-                ),
-                style: const TextStyle(color: Colors.white),
-                onChanged: _searchTags,
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    _filterByTag(value);
-                  }
-                },
-              )
-            : const Text('Community Feed'),
+        title: const Text('Community Feed'),
         elevation: 0,
         actions: [
           if (!_isOnline)
@@ -145,15 +103,13 @@ class _FeedScreenState extends State<FeedScreen> {
               ),
             ),
           IconButton(
-            icon: Icon(_showSearchBar ? Icons.close : Icons.search_rounded),
+            icon: const Icon(Icons.search_rounded),
             onPressed: () {
-              setState(() {
-                _showSearchBar = !_showSearchBar;
-                if (!_showSearchBar) {
-                  _searchController.clear();
-                  _tagSuggestions = [];
-                }
-              });
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SearchScreen(),
+                ),
+              );
             },
           ),
           IconButton(
@@ -164,25 +120,6 @@ class _FeedScreenState extends State<FeedScreen> {
       ),
       body: Column(
         children: [
-          // Tag suggestions
-          if (_tagSuggestions.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.grey[100],
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _tagSuggestions.map((tag) {
-                  return InkWell(
-                    onTap: () => _filterByTag(tag['name']),
-                    child: Chip(
-                      label: Text('#${tag['name']} (${tag['usage_count']})'),
-                      avatar: const Icon(Icons.tag, size: 16),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
           // Selected tag filter
           if (_selectedTag != null)
             Container(

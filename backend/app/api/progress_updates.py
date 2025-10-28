@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import datetime, timezone
 from app.schemas.progress_update import ProgressUpdateCreate, ProgressUpdateResponse
 from app.database import get_db
 from app.models.progress_update import ProgressUpdate
@@ -18,6 +19,14 @@ router = APIRouter()
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
+
+def ensure_utc(dt):
+    """Ensure datetime is timezone-aware UTC"""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
 
 @router.post("/wishes/{wish_id}/progress", status_code=status.HTTP_201_CREATED)
 async def create_progress_update(
@@ -92,10 +101,42 @@ async def create_progress_update(
     
     # Update wish progress if provided
     if progress_value is not None:
+        from app.models.wish import CompletionStatus
+        from app.models.completion_verification import CompletionVerification
+        from app.api.notifications import create_notification
+        
+        old_progress = wish.progress
         wish.progress = progress_value
-        if progress_value >= 100:
-            wish.is_completed = True
-            wish.status = "completed"
+        if progress_value >= 100 and old_progress < 100:
+            if wish.requires_verification:
+                # If verification is required, set status to pending verification
+                wish.completion_status = CompletionStatus.PENDING_VERIFICATION
+                # Don't mark as completed yet - wait for verification
+                print(f"[progress_updates] Wish {wish.id} reached 100% - pending verification")
+                
+                # Notify all verifiers
+                verifications = db.query(CompletionVerification).filter(
+                    CompletionVerification.wish_id == wish.id
+                ).all()
+                
+                for verification in verifications:
+                    try:
+                        create_notification(
+                            db=db,
+                            user_id=verification.verifier_user_id,
+                            actor_id=wish.user_id,
+                            notification_type="verification_ready",
+                            wish_id=wish.id,
+                            content=f"{current_user.username} has completed their goal '{wish.title}' and needs your verification!"
+                        )
+                    except Exception as e:
+                        print(f"[progress_updates] Failed to notify verifier {verification.verifier_user_id}: {e}")
+            else:
+                # No verification required - mark as completed
+                wish.is_completed = True
+                wish.status = "completed"
+                wish.completion_status = CompletionStatus.SELF_VERIFIED
+                print(f"[progress_updates] Wish {wish.id} reached 100% - auto-completed (no verification required)")
     
     db.commit()
     db.refresh(progress_update)
@@ -107,7 +148,7 @@ async def create_progress_update(
         "user_id": progress_update.user_id,
         "content": progress_update.content,
         "progress_value": progress_update.progress_value,
-        "created_at": progress_update.created_at.isoformat(),
+        "created_at": ensure_utc(progress_update.created_at).isoformat(),
         "attachments": [
             {
                 "id": att.id,
@@ -142,7 +183,7 @@ def get_progress_updates(
             "user_id": update.user_id,
             "content": update.content,
             "progress_value": update.progress_value,
-            "created_at": update.created_at.isoformat(),
+            "created_at": ensure_utc(update.created_at).isoformat(),
             "image_url": update.image_url,  # Keep for backwards compatibility
             "attachments": [
                 {
